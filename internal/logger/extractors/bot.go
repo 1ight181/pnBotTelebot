@@ -16,6 +16,12 @@ func (e *BotContextExtractor) Extract(ctx context.Context) map[string]interface{
 	if chatID, ok := ctx.Value(contextkeys.ChatIDKey).(int64); ok {
 		fields["chat_id"] = chatID
 	}
+	if text, ok := ctx.Value(contextkeys.TextKey).(string); ok {
+		fields["text"] = text
+	}
+	if data, ok := ctx.Value(contextkeys.DataKey).(string); ok {
+		fields["data"] = data
+	}
 
 	return fields
 }

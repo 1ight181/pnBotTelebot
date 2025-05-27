@@ -21,5 +21,5 @@ type Logger interface {
 	Panic(msg string)
 	Panicf(format string, args ...interface{})
 
-	SetContext(ctx context.Context)
+	WithContext(ctx context.Context) Logger
 }

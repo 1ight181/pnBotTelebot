@@ -8,34 +8,39 @@ import (
 )
 
 type TelegramBot struct {
-	botAPI   *telebot.Bot
-	handlers []ifaces.Handler
-	context  context.Context
+	botApi      *telebot.Bot
+	handlers    []ifaces.Handler
+	middlewares []telebot.MiddlewareFunc
+	context     context.Context
 }
 
 type TelegramBotOptions struct {
-	BotAPI   *telebot.Bot
-	Handlers []ifaces.Handler
-	Context  context.Context
+	BotApi      *telebot.Bot
+	Handlers    []ifaces.Handler
+	Middlewares []telebot.MiddlewareFunc
+	Context     context.Context
 }
 
 func New(opts TelegramBotOptions) *TelegramBot {
 	return &TelegramBot{
-		botAPI:   opts.BotAPI,
-		handlers: opts.Handlers,
-		context:  opts.Context,
+		botApi:      opts.BotApi,
+		handlers:    opts.Handlers,
+		middlewares: opts.Middlewares,
+		context:     opts.Context,
 	}
 }
 
-func (tb *TelegramBot) Start() {
-	for _, handler := range tb.handlers {
-		handler.StartHandling(tb.botAPI)
+func (tgb *TelegramBot) Start() {
+	tgb.botApi.Use(tgb.middlewares...)
+
+	for _, handler := range tgb.handlers {
+		handler.StartHandling(tgb.botApi)
 	}
 
-	go tb.botAPI.Start()
+	go tgb.botApi.Start()
 
 	go func() {
-		<-tb.context.Done()
-		tb.botAPI.Stop()
+		<-tgb.context.Done()
+		tgb.botApi.Stop()
 	}()
 }

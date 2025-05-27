@@ -24,10 +24,12 @@ func (eh *ErrorHandler) HandleError(err error, c telebot.Context) {
 
 	ctx := context.WithValue(context.Background(), contextkeys.UserIDKey, userId)
 	ctx = context.WithValue(ctx, contextkeys.ChatIDKey, chatId)
+	ctx = context.WithValue(ctx, contextkeys.TextKey, c.Text())
+	ctx = context.WithValue(ctx, contextkeys.DataKey, c.Data())
 
-	eh.logger.SetContext(ctx)
+	contextLogger := eh.logger.WithContext(ctx)
 
-	eh.logger.Warnf("Ошибка: %v", err)
+	contextLogger.Warnf("Ошибка: %v", err)
 
 	if c != nil {
 		c.Send("Произошла ошибка. Попробуйте позже.")

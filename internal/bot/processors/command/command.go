@@ -8,12 +8,12 @@ import (
 )
 
 type CommandProcessor struct {
-	deps *deps.ProcessorDependencies
+	dependencies *deps.ProcessorDependencies
 }
 
 func New(deps *deps.ProcessorDependencies) *CommandProcessor {
 	return &CommandProcessor{
-		deps: deps,
+		dependencies: deps,
 	}
 }
 

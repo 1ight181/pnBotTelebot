@@ -9,7 +9,7 @@ func LoadBotConfig(botConfig conf.Bot) (string, bool, string, string, string) {
 	is_debug := botConfig.IsDebug
 	port := botConfig.Port
 	host := botConfig.Host
-	webhookURL := botConfig.WebhookURL
+	WebhookUrl := botConfig.WebhookUrl
 
-	return token, is_debug, port, host, webhookURL
+	return token, is_debug, port, host, WebhookUrl
 }

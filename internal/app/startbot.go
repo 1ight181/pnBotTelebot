@@ -11,6 +11,7 @@ import (
 	errorhandler "pnBot/internal/bot/errorhandlers"
 	handlers "pnBot/internal/bot/handlers"
 	ifaces "pnBot/internal/bot/interfaces"
+	middleware "pnBot/internal/bot/middlewares"
 	callback "pnBot/internal/bot/processors/callback"
 	command "pnBot/internal/bot/processors/command"
 	deps "pnBot/internal/bot/processors/dependencies"
@@ -20,7 +21,7 @@ import (
 )
 
 func StartBot(botConfig *models.Bot, logger loggerifaces.Logger, ctx context.Context) {
-	token, isDebug, port, host, webhookURL := loaders.LoadBotConfig(*botConfig)
+	token, isDebug, port, host, webhookUrl := loaders.LoadBotConfig(*botConfig)
 
 	address := fmt.Sprintf("%s:%s", host, port)
 
@@ -34,7 +35,7 @@ func StartBot(botConfig *models.Bot, logger loggerifaces.Logger, ctx context.Con
 		poller = &telebot.Webhook{
 			Listen: address,
 			Endpoint: &telebot.WebhookEndpoint{
-				PublicURL: webhookURL,
+				PublicURL: webhookUrl,
 			},
 		}
 	}
@@ -48,7 +49,7 @@ func StartBot(botConfig *models.Bot, logger loggerifaces.Logger, ctx context.Con
 		OnError:   errorhandler.HandleError,
 	}
 
-	botAPI, err := telebot.NewBot(pref)
+	botApi, err := telebot.NewBot(pref)
 	if err != nil {
 		logger.Fatalf("Ошибка при создании telebot: %v", err)
 	}
@@ -56,7 +57,6 @@ func StartBot(botConfig *models.Bot, logger loggerifaces.Logger, ctx context.Con
 	textProvider := CreateTextProvider()
 
 	dependenciesOptions := deps.ProcessorDependenciesOptions{
-		Logger:       logger,
 		TextProvider: textProvider,
 	}
 
@@ -79,10 +79,15 @@ func StartBot(botConfig *models.Bot, logger loggerifaces.Logger, ctx context.Con
 		callbackHandler,
 	}
 
+	middlewares := []telebot.MiddlewareFunc{
+		middleware.LogMiddleware(logger),
+	}
+
 	botOptions := tb.TelegramBotOptions{
-		BotAPI:   botAPI,
-		Handlers: handlers,
-		Context:  ctx,
+		BotApi:      botApi,
+		Handlers:    handlers,
+		Middlewares: middlewares,
+		Context:     ctx,
 	}
 
 	bot := tb.New(botOptions)

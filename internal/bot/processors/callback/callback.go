@@ -9,12 +9,12 @@ import (
 )
 
 type CallbackProcessor struct {
-	deps *deps.ProcessorDependencies
+	dependencies *deps.ProcessorDependencies
 }
 
-func New(deps *deps.ProcessorDependencies) *CallbackProcessor {
+func New(dependencies *deps.ProcessorDependencies) *CallbackProcessor {
 	return &CallbackProcessor{
-		deps: deps,
+		dependencies: dependencies,
 	}
 }
 

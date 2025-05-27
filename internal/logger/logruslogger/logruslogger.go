@@ -3,6 +3,8 @@ package logruslogger
 import (
 	"context"
 
+	logger "pnBot/internal/logger/interfaces"
+
 	"github.com/sirupsen/logrus"
 )
 
@@ -52,6 +54,8 @@ func (l *LogrusLogger) Panicf(format string, args ...interface{}) {
 	l.Entry.Panicf(format, args...)
 }
 
-func (l *LogrusLogger) SetContext(ctx context.Context) {
-	l.Entry = l.Entry.WithContext(ctx)
+func (l *LogrusLogger) WithContext(ctx context.Context) logger.Logger {
+	return &LogrusLogger{
+		Entry: l.Entry.WithContext(ctx),
+	}
 }

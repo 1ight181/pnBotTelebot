@@ -11,9 +11,9 @@ import (
 func CreateLoggerFactory() loggeriface.LoggerFactory[logrusfac.NewModuleLoggerOptions, logruslogger.LogrusLogger] {
 	loggerFactoryOptions := logrusfac.LogrusLoggerFactoryOptions{
 		Level: logrus.DebugLevel,
-		Formatter: &logrus.TextFormatter{
+		Formatter: &logrus.JSONFormatter{
 			TimestampFormat: "2006-01-02 15:04:05",
-			ForceColors:     true,
+			PrettyPrint:     true,
 		},
 	}
 	return logrusfac.New(loggerFactoryOptions)

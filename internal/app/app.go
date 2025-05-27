@@ -14,16 +14,14 @@ import (
 
 func Run() {
 	stopSignal := make(chan os.Signal, 1)
-	signal.Notify(stopSignal, os.Interrupt, syscall.SIGTERM)
+	signal.Notify(stopSignal, os.Interrupt, syscall.SIGTERM, syscall.SIGINT, syscall.SIGQUIT)
 	ctx, cancel := context.WithCancel(context.Background())
 
 	loggerFactory := CreateLoggerFactory()
 	baseLogger := loggerFactory.NewBaseLogger()
 
-	botContextExtractor := extractors.BotContextExtractor{}
-
 	botContextHook := hooks.ContextHook{
-		Extractor: &botContextExtractor,
+		Extractor: &extractors.BotContextExtractor{},
 	}
 
 	botLoggerOptions := loggerfactory.NewModuleLoggerOptions{
