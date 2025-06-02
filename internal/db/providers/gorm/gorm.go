@@ -2,6 +2,7 @@ package providers
 
 import (
 	"context"
+	"fmt"
 
 	dbifaces "pnBot/internal/db/interfaces"
 
@@ -72,4 +73,16 @@ func (g *GormDataBaseProvider) attachCallbacks() {
 
 func (g *GormDataBaseProvider) GetRawDb() *gorm.DB {
 	return g.dataBase
+}
+
+func (g *GormDataBaseProvider) CloseConnection() error {
+	db, err := g.dataBase.DB()
+	if err != nil {
+		return fmt.Errorf("не удалось закрыть пул соединений с БД: %w", err)
+	}
+
+	if err := db.Close(); err != nil {
+		return fmt.Errorf("не удалось закрыть пул соединений с БД: %w", err)
+	}
+	return nil
 }

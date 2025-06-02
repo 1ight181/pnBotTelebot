@@ -30,7 +30,14 @@ func Run() {
 		Hook:       &botContextHook,
 	}
 
+	dbLoggerOptions := loggerfactory.NewModuleLoggerOptions{
+		BaseLogger: baseLogger,
+		ModuleName: "DATA_BASE",
+		Hook:       nil,
+	}
+
 	botLogger := loggerFactory.NewLoggerWithContext(botLoggerOptions)
+	dbLogger := loggerFactory.NewLoggerWithContext(dbLoggerOptions)
 
 	appConfigOptions := AppConfigOptions{
 		Provider:    &viperprov.ViperConfigProvider{},
@@ -45,14 +52,16 @@ func Run() {
 		baseLogger.Fatalf("Ошибка загрузки конфигурации: %v", err)
 	}
 
-	StartBot(&config.Bot, botLogger, ctx)
+	dbProvider := CreateDataBase(&config.DataBase, dbLogger, ctx)
+
+	StartBot(&config.Bot, botLogger, dbProvider, ctx)
 
 	<-stopSignal
 	baseLogger.Info("Получен сигнал завершения, остановка...")
 
 	cancel()
 
-	shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer shutdownCancel()
 
 	<-shutdownCtx.Done()

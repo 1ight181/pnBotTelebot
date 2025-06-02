@@ -1,0 +1,6 @@
+DROP TABLE IF EXISTS notifications_log;
+DROP TABLE IF EXISTS subscriptions;
+DROP TABLE IF EXISTS promotions;
+DROP TABLE IF EXISTS categories;
+DROP TABLE IF EXISTS sources;
+DROP TABLE IF EXISTS users;

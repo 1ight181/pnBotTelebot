@@ -17,10 +17,11 @@ import (
 	deps "pnBot/internal/bot/processors/dependencies"
 	loaders "pnBot/internal/config/loaders"
 	models "pnBot/internal/config/models"
+	dbifaces "pnBot/internal/db/interfaces"
 	loggerifaces "pnBot/internal/logger/interfaces"
 )
 
-func StartBot(botConfig *models.Bot, logger loggerifaces.Logger, ctx context.Context) {
+func StartBot(botConfig *models.Bot, logger loggerifaces.Logger, dbProvider dbifaces.DataBaseProvider, ctx context.Context) {
 	token, isDebug, port, host, webhookUrl := loaders.LoadBotConfig(*botConfig)
 
 	address := fmt.Sprintf("%s:%s", host, port)
@@ -58,6 +59,7 @@ func StartBot(botConfig *models.Bot, logger loggerifaces.Logger, ctx context.Con
 
 	dependenciesOptions := deps.ProcessorDependenciesOptions{
 		TextProvider: textProvider,
+		DbProvider:   dbProvider,
 	}
 
 	dependencies := deps.New(dependenciesOptions)
@@ -88,6 +90,7 @@ func StartBot(botConfig *models.Bot, logger loggerifaces.Logger, ctx context.Con
 		Handlers:    handlers,
 		Middlewares: middlewares,
 		Context:     ctx,
+		Logger:      logger,
 	}
 
 	bot := tb.New(botOptions)

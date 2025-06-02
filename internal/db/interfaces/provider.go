@@ -15,4 +15,5 @@ type DataBaseProvider interface {
 	Exec(ctx context.Context, sql string, values ...any) error
 	WithTransaction(tx *gorm.DB) DataBaseProvider
 	RunInTransaction(ctx context.Context, fn func(tx DataBaseProvider) error) error
+	CloseConnection() error
 }

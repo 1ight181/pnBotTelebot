@@ -1,6 +1,7 @@
 package callbacks
 
 import (
+	dbifaces "pnBot/internal/db/interfaces"
 	gormprov "pnBot/internal/db/providers/gorm"
 	loggeriface "pnBot/internal/logger/interfaces"
 
@@ -11,7 +12,13 @@ type GormLogCallbackRegistrar struct {
 	logger loggeriface.Logger
 }
 
-func (glcr *GormLogCallbackRegistrar) RegisterCallback(gormProvider gormprov.GormDataBaseProvider) {
+func New(logger loggeriface.Logger) dbifaces.CallbackRegistrar[*gormprov.GormDataBaseProvider] {
+	return &GormLogCallbackRegistrar{
+		logger: logger,
+	}
+}
+
+func (glcr *GormLogCallbackRegistrar) RegisterCallback(gormProvider *gormprov.GormDataBaseProvider) {
 	rawDb := gormProvider.GetRawDb()
 
 	rawDb.Callback().Create().Before("gorm:create").Register("log:before_create", func(tx *gorm.DB) {
