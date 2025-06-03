@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ru">
+	<head>
+		<meta charset="UTF-8" />
+		<title>Админка (HTMX)</title>
+		<script src="https://unpkg.com/htmx.org@1.9.2"></script>
+		<style>
+			body {
+				font-family: sans-serif;
+				margin: 2em;
+			}
+			form {
+				margin-bottom: 2em;
+				padding: 1em;
+				border: 1px solid #ccc;
+				border-radius: 8px;
+			}
+			label {
+				font-weight: bold;
+				display: block;
+				margin-top: 1em;
+			}
+			input,
+			select,
+			textarea {
+				width: 100%;
+				padding: 6px;
+				margin-top: 4px;
+			}
+			button {
+				margin-top: 1em;
+				padding: 8px 12px;
+			}
+			.results {
+				margin-top: 10px;
+				color: green;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Админка (HTMX)</h1>
+
+		<!-- Категория -->
+		<h2>Новая категория</h2>
+		<form
+			hx-post="/create/categories"
+			hx-target="#category-result"
+			hx-swap="afterbegin"
+		>
+			<label>Название категории:</label>
+			<input type="text" name="name" required />
+			<button type="submit">Создать</button>
+		</form>
+		<div id="category-result" class="results"></div>
+
+		<!-- Партнёр -->
+		<h2>Новый партнёр</h2>
+		<form
+			hx-post="/create/partners"
+			hx-target="#partner-result"
+			hx-swap="afterbegin"
+			enctype="multipart/form-data"
+		>
+			<label>Название:</label>
+			<input type="text" name="name" required />
+
+			<label>Логотип (загрузить файл):</label>
+			<input type="file" name="logo_file" accept="image/*" />
+
+			<button type="submit">Создать</button>
+		</form>
+		<div id="partner-result" class="results"></div>
+
+		<!-- Оффер -->
+		<h2>Новый оффер</h2>
+		<form
+			hx-post="/create/offers"
+			hx-target="#offer-result"
+			hx-swap="afterbegin"
+		>
+			<label>Внутренний ID партнёра:</label>
+			<input type="text" name="partner_internal_offer_id" required />
+
+			<label>Заголовок:</label>
+			<input type="text" name="title" required />
+
+			<label>Описание:</label>
+			<textarea name="description"></textarea>
+
+			<label>Статус:</label>
+			<select name="status">
+				<option value="active">Активен</option>
+				<option value="paused">Пауза</option>
+				<option value="archived">Архив</option>
+			</select>
+
+			<label>Категория:</label>
+			<select id="category-select" name="category_id">
+				{{range .Categories}}
+				<option value="{{.ID}}">{{.Name}}</option>
+				{{end}}
+			</select>
+
+			<label>Партнёр:</label>
+			<select id="partner-select" name="partner_id">
+				{{range .Partners}}
+				<option value="{{.ID}}">{{.Name}}</option>
+				{{end}}
+			</select>
+
+			<label>Tracking link:</label>
+			<input type="text" name="tracking_link" />
+
+			<label>Payout:</label>
+			<input type="number" step="0.01" name="payout" />
+
+			<button type="submit">Создать</button>
+		</form>
+		<div id="offer-result" class="results"></div>
+
+		<!-- Креатив -->
+		<h2>Новый креатив</h2>
+		<form
+			hx-post="/create/creatives"
+			hx-target="#creative-result"
+			hx-swap="afterbegin"
+			hx-encoding="multipart/form-data"
+			enctype="multipart/form-data"
+		>
+			<label>Внутренний ID:</label>
+			<input type="text" name="partner_internal_creative_id" required />
+
+			<label>Оффер:</label>
+			<select id="offer-select" name="offer_id">
+				{{range .Offers}}
+				<option value="{{.ID}}">{{.Title}}</option>
+				{{end}}
+			</select>
+
+			<label>Тип:</label>
+			<input type="text" name="type" />
+
+			<label>Изображение (загрузить файл):</label>
+			<input type="file" name="image" accept="image/*" required />
+
+			<button type="submit">Создать</button>
+		</form>
+		<div id="creative-result" class="results"></div>
+	</body>
+</html>
