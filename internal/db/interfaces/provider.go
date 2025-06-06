@@ -1,19 +1,29 @@
 package interfaces
 
 import (
-	"context"
+	ctx "context"
 
 	"gorm.io/gorm"
 )
 
 type DataBaseProvider interface {
-	Find(ctx context.Context, out any, where ...any) error
-	First(ctx context.Context, out any, where ...any) error
-	Create(ctx context.Context, value any) error
-	Save(ctx context.Context, value any) error
-	Delete(ctx context.Context, value any, where ...any) error
-	Exec(ctx context.Context, sql string, values ...any) error
+	Find(context ctx.Context, out any, where ...any) error
+
+	First(context ctx.Context, out any, where ...any) error
+	FirstOrCreate(context ctx.Context, out any, where any, defaults any) (bool, error)
+	Create(context ctx.Context, value any) error
+
+	Update(context ctx.Context, where any, column string, value any) error
+	Updates(context ctx.Context, where any, values any) error
+
+	Save(context ctx.Context, value any) error
+
+	Delete(context ctx.Context, value any, where ...any) error
+
+	Exec(context ctx.Context, sql string, values ...any) error
+
 	WithTransaction(tx *gorm.DB) DataBaseProvider
-	RunInTransaction(ctx context.Context, fn func(tx DataBaseProvider) error) error
+	RunInTransaction(context ctx.Context, fn func(tx DataBaseProvider) error) error
+
 	CloseConnection() error
 }

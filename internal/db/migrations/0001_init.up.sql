@@ -55,7 +55,7 @@ CREATE TABLE IF NOT EXISTS users (
     tg_id BIGINT UNIQUE NOT NULL,
     chat_id BIGINT UNIQUE NOT NULL,
     username TEXT,
-    name TEXT,
+    fullname TEXT,
     is_subscribed BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
