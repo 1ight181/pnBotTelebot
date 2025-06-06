@@ -7,64 +7,69 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-type fiberContext struct {
+type FiberContext struct {
 	context *fiber.Ctx
 }
 
-func (fc *fiberContext) Param(name string) string {
+func (fc *FiberContext) Param(name string) string {
 	return fc.context.Params(name)
 }
 
-func (fc *fiberContext) Query(name string) string {
+func (fc *FiberContext) Query(name string) string {
 	return fc.context.Query(name)
 }
 
-func (fc *fiberContext) Header(name string) string {
+func (fc *FiberContext) Header(name string) string {
 	return fc.context.Get(name)
 }
 
-func (fc *fiberContext) Method() string {
+func (fc *FiberContext) Method() string {
 	return fc.context.Method()
 }
 
-func (fc *fiberContext) Path() string {
+func (fc *FiberContext) Path() string {
 	return fc.context.Path()
 }
 
-func (fc *fiberContext) BodyParser(out interface{}) error {
+func (fc *FiberContext) BodyParser(out interface{}) error {
 	return fc.context.BodyParser(out)
 }
 
-func (fc *fiberContext) Cookie(name string) string {
+func (fc *FiberContext) Cookie(name string) string {
 	return fc.context.Cookies(name)
 }
 
-func (fc *fiberContext) JSON(code int, data interface{}) error {
+func (fc *FiberContext) JSON(code int, data interface{}) error {
 	return fc.context.Status(code).JSON(data)
 }
 
-func (fc *fiberContext) SendString(code int, data string) error {
-	return fc.context.Status(code).SendString(data)
+func (fc *FiberContext) SendString(data string) error {
+	return fc.context.SendString(data)
 }
 
-func (fc *fiberContext) Status(code int) adminifaces.Context {
+func (fc *FiberContext) Status(code int) adminifaces.Context {
 	fc.context.Status(code)
 	return fc
 }
 
-func (fc *fiberContext) FormFile(name string) (*multipart.FileHeader, error) {
+func (fc *FiberContext) Type(contentType string) adminifaces.Context {
+	fc.context.Type(contentType)
+	return fc
+}
+
+func (fc *FiberContext) FormFile(name string) (*multipart.FileHeader, error) {
 	return fc.context.FormFile(name)
 }
 
-func (fc *fiberContext) FormValue(name string) string {
+func (fc *FiberContext) FormValue(name string) string {
 	return fc.context.FormValue(name)
 }
 
-func (fc *fiberContext) SetHeader(key, value string) {
+func (fc *FiberContext) SetHeader(key, value string) {
 	fc.context.Set(key, value)
 }
 
-func (fc *fiberContext) SetCookie(name, value string, maxAge int) {
+func (fc *FiberContext) SetCookie(name, value string, maxAge int) {
 	fc.context.Cookie(&fiber.Cookie{
 		Name:   name,
 		Value:  value,
@@ -72,17 +77,21 @@ func (fc *fiberContext) SetCookie(name, value string, maxAge int) {
 	})
 }
 
-func (fc *fiberContext) Render(code int, name string, data map[string]any) error {
+func (fc *FiberContext) Render(code int, name string, data map[string]any) error {
 	return fc.context.Status(code).Render(name, data)
 }
 
-func (fc *fiberContext) Redirect(location string, status ...int) error {
+func (fc *FiberContext) Redirect(location string, status ...int) error {
 	if len(status) > 0 {
 		return fc.context.Redirect(location, status[0])
 	}
 	return fc.context.Redirect(location)
 }
 
-func (fc *fiberContext) Context() any {
+func (fc *FiberContext) Next() error {
+	return fc.context.Next()
+}
+
+func (fc *FiberContext) Context() any {
 	return fc.context
 }

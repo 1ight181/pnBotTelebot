@@ -1,7 +1,7 @@
 package app
 
 import (
-	"context"
+	ctx "context"
 	"os"
 	"os/signal"
 	viperprov "pnBot/internal/config/providers/viper"
@@ -15,7 +15,7 @@ import (
 func Run() {
 	stopSignal := make(chan os.Signal, 1)
 	signal.Notify(stopSignal, os.Interrupt, syscall.SIGTERM, syscall.SIGINT, syscall.SIGQUIT)
-	ctx, cancel := context.WithCancel(context.Background())
+	context, cancel := ctx.WithCancel(ctx.Background())
 
 	loggerFactory := CreateLoggerFactory()
 	baseLogger := loggerFactory.NewBaseLogger()
@@ -36,8 +36,15 @@ func Run() {
 		Hook:       nil,
 	}
 
+	adminPanelLoggerOptions := loggerfactory.NewModuleLoggerOptions{
+		BaseLogger: baseLogger,
+		ModuleName: "ADMIN_PANEL",
+		Hook:       nil,
+	}
+
 	botLogger := loggerFactory.NewLoggerWithContext(botLoggerOptions)
 	dbLogger := loggerFactory.NewLoggerWithContext(dbLoggerOptions)
+	adminPanelLogger := loggerFactory.NewLoggerWithContext(adminPanelLoggerOptions)
 
 	appConfigOptions := AppConfigOptions{
 		Provider:    &viperprov.ViperConfigProvider{},
@@ -52,17 +59,19 @@ func Run() {
 		baseLogger.Fatalf("Ошибка загрузки конфигурации: %v", err)
 	}
 
-	dbProvider := CreateDataBase(&config.DataBase, dbLogger, ctx)
+	dbProvider := CreateDataBase(config.DataBase, dbLogger, context)
 
-	StartBot(&config.Bot, botLogger, dbProvider, ctx)
+	StartBot(&config.Bot, botLogger, dbProvider, context)
+
+	StartAdminPanel(config.AdminPanel, config.ImageUploader, dbProvider, adminPanelLogger, context)
 
 	<-stopSignal
 	baseLogger.Info("Получен сигнал завершения, остановка...")
 
 	cancel()
 
-	shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 3*time.Second)
+	shutdownContext, shutdownCancel := ctx.WithTimeout(ctx.Background(), 3*time.Second)
 	defer shutdownCancel()
 
-	<-shutdownCtx.Done()
+	<-shutdownContext.Done()
 }

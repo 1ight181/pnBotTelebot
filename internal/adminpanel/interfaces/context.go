@@ -14,12 +14,14 @@ type Context interface {
 	FormFile(name string) (*multipart.FileHeader, error)
 
 	JSON(code int, data interface{}) error
-	SendString(code int, data string) error
+	SendString(data string) error
 	Status(code int) Context
+	Type(contentType string) Context
 	SetHeader(key, value string)
 	SetCookie(name, value string, maxAge int)
 	Render(code int, name string, data map[string]any) error
 	Redirect(location string, status ...int) error
 
+	Next() error
 	Context() any
 }

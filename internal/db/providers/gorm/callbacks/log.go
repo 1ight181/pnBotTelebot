@@ -21,8 +21,8 @@ func New(logger loggeriface.Logger) dbifaces.CallbackRegistrar[*gormprov.GormDat
 func (glcr *GormLogCallbackRegistrar) RegisterCallback(gormProvider *gormprov.GormDataBaseProvider) {
 	rawDb := gormProvider.GetRawDb()
 
-	rawDb.Callback().Create().Before("gorm:create").Register("log:before_create", func(tx *gorm.DB) {
-		glcr.logger.Infof("[Before Create] SQL: %s, Vars: %v", tx.Statement.SQL.String(), tx.Statement.Vars)
+	rawDb.Callback().Create().After("gorm:create").Register("log:After_create", func(tx *gorm.DB) {
+		glcr.logger.Infof("[After Create] SQL: %s, Vars: %v", tx.Statement.SQL.String(), tx.Statement.Vars)
 	})
 	rawDb.Callback().Create().After("gorm:create").Register("log:after_create", func(tx *gorm.DB) {
 		if tx.Error != nil {
@@ -30,8 +30,8 @@ func (glcr *GormLogCallbackRegistrar) RegisterCallback(gormProvider *gormprov.Go
 		}
 	})
 
-	rawDb.Callback().Query().Before("gorm:query").Register("log:before_query", func(tx *gorm.DB) {
-		glcr.logger.Infof("[Before Select] SQL: %s, Vars: %v", tx.Statement.SQL.String(), tx.Statement.Vars)
+	rawDb.Callback().Query().After("gorm:query").Register("log:After_query", func(tx *gorm.DB) {
+		glcr.logger.Infof("[After Select] SQL: %s, Vars: %v", tx.Statement.SQL.String(), tx.Statement.Vars)
 	})
 	rawDb.Callback().Query().After("gorm:query").Register("log:after_query", func(tx *gorm.DB) {
 		if tx.Error != nil {
@@ -39,8 +39,8 @@ func (glcr *GormLogCallbackRegistrar) RegisterCallback(gormProvider *gormprov.Go
 		}
 	})
 
-	rawDb.Callback().Update().Before("gorm:update").Register("log:before_update", func(tx *gorm.DB) {
-		glcr.logger.Infof("[Before Update] SQL: %s, Vars: %v", tx.Statement.SQL.String(), tx.Statement.Vars)
+	rawDb.Callback().Update().After("gorm:update").Register("log:After_update", func(tx *gorm.DB) {
+		glcr.logger.Infof("[After Update] SQL: %s, Vars: %v", tx.Statement.SQL.String(), tx.Statement.Vars)
 	})
 	rawDb.Callback().Update().After("gorm:update").Register("log:after_update", func(tx *gorm.DB) {
 		if tx.Error != nil {
@@ -48,8 +48,8 @@ func (glcr *GormLogCallbackRegistrar) RegisterCallback(gormProvider *gormprov.Go
 		}
 	})
 
-	rawDb.Callback().Delete().Before("gorm:delete").Register("log:before_delete", func(tx *gorm.DB) {
-		glcr.logger.Infof("[Before Delete] SQL: %s, Vars: %v", tx.Statement.SQL.String(), tx.Statement.Vars)
+	rawDb.Callback().Delete().After("gorm:delete").Register("log:After_delete", func(tx *gorm.DB) {
+		glcr.logger.Infof("[After Delete] SQL: %s, Vars: %v", tx.Statement.SQL.String(), tx.Statement.Vars)
 	})
 	rawDb.Callback().Delete().After("gorm:delete").Register("log:after_delete", func(tx *gorm.DB) {
 		if tx.Error != nil {
@@ -57,8 +57,8 @@ func (glcr *GormLogCallbackRegistrar) RegisterCallback(gormProvider *gormprov.Go
 		}
 	})
 
-	rawDb.Callback().Row().Before("gorm:row").Register("log:before_row", func(tx *gorm.DB) {
-		glcr.logger.Infof("[Before Row] SQL: %s, Vars: %v", tx.Statement.SQL.String(), tx.Statement.Vars)
+	rawDb.Callback().Row().After("gorm:row").Register("log:After_row", func(tx *gorm.DB) {
+		glcr.logger.Infof("[After Row] SQL: %s, Vars: %v", tx.Statement.SQL.String(), tx.Statement.Vars)
 	})
 	rawDb.Callback().Row().After("gorm:row").Register("log:after_row", func(tx *gorm.DB) {
 		if tx.Error != nil {
@@ -66,8 +66,8 @@ func (glcr *GormLogCallbackRegistrar) RegisterCallback(gormProvider *gormprov.Go
 		}
 	})
 
-	rawDb.Callback().Raw().Before("gorm:raw").Register("log:before_raw", func(tx *gorm.DB) {
-		glcr.logger.Infof("[Before Raw Exec] SQL: %s, Vars: %v", tx.Statement.SQL.String(), tx.Statement.Vars)
+	rawDb.Callback().Raw().After("gorm:raw").Register("log:After_raw", func(tx *gorm.DB) {
+		glcr.logger.Infof("[After Raw Exec] SQL: %s, Vars: %v", tx.Statement.SQL.String(), tx.Statement.Vars)
 	})
 	rawDb.Callback().Raw().After("gorm:raw").Register("log:after_raw", func(tx *gorm.DB) {
 		if tx.Error != nil {

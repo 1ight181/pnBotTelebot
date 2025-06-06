@@ -21,12 +21,12 @@ func CreativePost(db dbifaces.DataBaseProvider, imageUploader imguploaderifaces.
 		offerIDStr := context.FormValue("offer_id")
 		typeStr := context.FormValue("type")
 		if partnerID == "" || offerIDStr == "" {
-			return context.SendString(400, "Обязательные поля не заполнены")
+			return context.Status(200).Type("text/html").SendString("<div class=error-box>Обязательные поля не заполнены</div>")
 		}
 
 		offerID, err := strconv.ParseUint(offerIDStr, 10, 64)
 		if err != nil {
-			return context.SendString(400, "Некорректный ID оффера")
+			return context.Status(200).Type("text/html").SendString("<div class=error-box>Некорректный ID оффера</div>")
 		}
 
 		resource, err := context.FormFile("image")
@@ -37,21 +37,21 @@ func CreativePost(db dbifaces.DataBaseProvider, imageUploader imguploaderifaces.
 		if err == nil {
 			resourceFile, err := resource.Open()
 			if err != nil {
-				return context.SendString(400, "Ошибка загрузки содержимого файла изображения")
+				return context.Status(200).Type("text/html").SendString("<div class=error-box>Ошибка загрузки содержимого файла изображения</div>")
 			}
 			defer resourceFile.Close()
 
 			buf, err := io.ReadAll(resourceFile)
 			if err != nil {
-				return context.SendString(400, "Ошибка при чтении файла изображения")
+				return context.Status(200).Type("text/html").SendString("<div class=error-box>Ошибка при чтении файла изображения</div>")
 			}
 			resourceURL, err = imageUploader.UploadImage(bytes.NewReader(buf), resource.Filename)
 			if err != nil {
-				return context.SendString(400, "Ошибка при получении URL изображения")
+				return context.Status(200).Type("text/html").SendString("<div class=error-box>Ошибка при получении URL изображения</div>")
 			}
 			width, height, err = imageutils.GetImageDimensions(bytes.NewReader(buf))
 			if err != nil {
-				return context.SendString(400, "Ошибка при получении размеров изображения")
+				return context.Status(200).Type("text/html").SendString("<div class=error-box>Ошибка при получении размеров изображения</div>")
 			}
 		} else {
 			resourceURL, width, height = "", 0, 0
@@ -69,21 +69,18 @@ func CreativePost(db dbifaces.DataBaseProvider, imageUploader imguploaderifaces.
 		}
 
 		if err := db.Create(contextBackground, &newCreative); err != nil {
-			return context.SendString(500, "Ошибка при создании креатива")
+			return context.Status(200).Type("text/html").SendString("<div class=error-box>Ошибка при создании креатива</div>")
 		}
 
 		var creatives []dbmodels.Creative
 		if err := db.Find(contextBackground, &creatives); err != nil {
-			return context.SendString(500, "Ошибка при загрузке креативов")
+			return context.Status(200).Type("text/html").SendString("<div class=error-box>Ошибка при загрузке креативов</div>")
 		}
 
 		response := `
-			<div id="creative-result" hx-swap-oob="true" style="color:green;">
-				Креатив успешно добавлен!
-			</div>
-
+			<div class="success-box"> Креатив успешно добавлен! </div>
 		`
 
-		return context.SendString(200, response)
+		return context.Status(200).Type("text/html").SendString(response)
 	}
 }

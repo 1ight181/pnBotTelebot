@@ -3,46 +3,54 @@ package partner
 import (
 	"bytes"
 	ctx "context"
+	"fmt"
 	"io"
+	"strconv"
+	"time"
+
 	adminifaces "pnBot/internal/adminpanel/interfaces"
 	dbifaces "pnBot/internal/db/interfaces"
 	dbmodels "pnBot/internal/db/models"
 	imguploaderifaces "pnBot/internal/imageuploader/interfaces"
-	"strconv"
-	"time"
+	loggerifaces "pnBot/internal/logger/interfaces"
 )
 
-func PartnerPost(db dbifaces.DataBaseProvider, imageUploader imguploaderifaces.ImageUploader) adminifaces.HandlerFunc {
+func PartnerPost(db dbifaces.DataBaseProvider, imageUploader imguploaderifaces.ImageUploader, logger loggerifaces.Logger) adminifaces.HandlerFunc {
 	return func(context adminifaces.Context) error {
 		contextBackground := ctx.Background()
 
 		var partners []dbmodels.Partner
 		if err := db.Find(contextBackground, &partners); err != nil {
-			return context.SendString(500, "Ошибка при загрузке партнёров")
+			logger.Errorf("Ошибка при загрузке партнёров: %v", err)
+			return context.Status(200).Type("text/html").SendString("<div class=error-box>Ошибка при загрузке партнёров</div>")
 		}
 
 		name := context.FormValue("name")
 		if name == "" {
-			return context.SendString(400, "Имя партнёра обязательно")
+			return context.Status(200).Type("text/html").SendString("<div class=error-box>Имя партнёра обязательно</div>")
 		}
 
-		resource, err := context.FormFile("logo_file") // ожидаем поле "logo_file"
+		resource, err := context.FormFile("logo_file")
 		var logoURL string
 
 		if err == nil {
 			resourceFile, err := resource.Open()
 			if err != nil {
-				return context.SendString(400, "Ошибка загрузки содержимого файла логотипа")
+				logger.Errorf("Ошибка при открытии файла логотипа: %v", err)
+				return context.Status(200).Type("text/html").SendString("<div class=error-box>Ошибка загрузки содержимого файла логотипа</div>")
 			}
 			defer resourceFile.Close()
 
 			buf, err := io.ReadAll(resourceFile)
 			if err != nil {
-				return context.SendString(400, "Ошибка при чтении файла логотипа")
+				logger.Errorf("Ошибка при чтении файла логотипа: %v", err)
+				return context.Status(200).Type("text/html").SendString("<div class=error-box>Ошибка при чтении файла логотипа</div>")
 			}
+
 			logoURL, err = imageUploader.UploadImage(bytes.NewReader(buf), resource.Filename)
 			if err != nil {
-				return context.SendString(400, "Ошибка при загрузке файла логотипа")
+				logger.Errorf("Ошибка при загрузке файла логотипа: %v", err)
+				return context.Status(200).Type("text/html").SendString("<div class=error-box>Ошибка при загрузке файла логотипа</div>")
 			}
 		} else {
 			logoURL = ""
@@ -55,26 +63,25 @@ func PartnerPost(db dbifaces.DataBaseProvider, imageUploader imguploaderifaces.I
 		}
 
 		if err := db.Create(contextBackground, &newPartner); err != nil {
-			return context.SendString(500, "Ошибка при создании партнёра")
+			logger.Errorf("Ошибка при создании партнёра: %v", err)
+			return context.Status(200).Type("text/html").SendString("<div class=error-box>Ошибка при создании партнёра</div>")
 		}
 
 		if err := db.Find(contextBackground, &partners); err != nil {
-			return context.SendString(500, "Ошибка при загрузке партнёров")
+			logger.Errorf("Ошибка при загрузке партнёров после создания: %v", err)
+			return context.Status(200).Type("text/html").SendString("<div class=error-box>Ошибка при загрузке партнёров</div>")
 		}
 
-		response := `
-			<div id="partner-result" hx-swap-oob="true" style="color:green;">
-				Партнёр "` + newPartner.Name + `" успешно добавлен!
-			</div>
-
+		response := fmt.Sprintf(`
+			<div class="success-box">Партнёр "%s" успешно добавлен!</div>
 			<select id="partner-select" name="partner_id" hx-swap-oob="true">
-		`
+		`, newPartner.Name)
 
 		for _, partner := range partners {
 			response += `<option value="` + strconv.FormatUint(uint64(partner.ID), 10) + `">` + partner.Name + `</option>`
 		}
 		response += "</select>"
 
-		return context.SendString(200, response)
+		return context.Status(200).Type("text/html").SendString(response)
 	}
 }

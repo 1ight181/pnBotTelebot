@@ -17,7 +17,7 @@ import (
 	loggerifaces "pnBot/internal/logger/interfaces"
 )
 
-func CreateDataBase(dbConfig *models.DataBase, logger loggerifaces.Logger, ctx context.Context) dbifaces.DataBaseProvider {
+func CreateDataBase(dbConfig models.DataBase, logger loggerifaces.Logger, context context.Context) dbifaces.DataBaseProvider {
 	dsn, migrationsPath := loaders.LoadDbConfig(dbConfig)
 
 	gormDB, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
@@ -62,11 +62,11 @@ func CreateDataBase(dbConfig *models.DataBase, logger loggerifaces.Logger, ctx c
 	logger.Infof("БД подключена по DSN: %s", maskedDsn)
 
 	go func() {
-		<-ctx.Done()
+		<-context.Done()
 		if err := dbProvider.CloseConnection(); err != nil {
 			logger.Fatalf("Ошибка при закрытии подключения: %v", err)
 		} else {
-			logger.Info("Подключение к БД успешно закрыто")
+			logger.Info("Пул подключений к БД успешно закрыт")
 		}
 	}()
 

@@ -26,16 +26,16 @@ func OfferPost(db dbifaces.DataBaseProvider) adminifaces.HandlerFunc {
 		payoutStr := context.FormValue("payout")
 
 		if partnerIDStr == "" || categoryIDStr == "" || partnerInternalOfferID == "" || title == "" {
-			return context.SendString(400, "Обязательные поля не заполнены")
+			return context.Status(200).Type("text/html").SendString("<div class=error-box>Обязательные поля не заполнены</div>")
 		}
 
 		partnerID, err := strconv.ParseUint(partnerIDStr, 10, 64)
 		if err != nil {
-			return context.SendString(400, "Некорректный partner_id")
+			return context.Status(200).Type("text/html").SendString("<div class=error-box>Некорректный partner_id</div>")
 		}
 		categoryID, err := strconv.ParseUint(categoryIDStr, 10, 64)
 		if err != nil {
-			return context.SendString(400, "Некорректный category_id")
+			return context.Status(200).Type("text/html").SendString("<div class=error-box>Некорректный category_id</div>")
 		}
 		payout, _ := strconv.ParseFloat(payoutStr, 64)
 
@@ -53,19 +53,17 @@ func OfferPost(db dbifaces.DataBaseProvider) adminifaces.HandlerFunc {
 		}
 
 		if err := db.Create(contextBackground, &newOffer); err != nil {
-			return context.SendString(500, "Ошибка при создании оффера")
+			return context.Status(200).Type("text/html").SendString("<div class=error-box>Ошибка при создании оффера</div>")
 		}
 
 		var offers []dbmodels.Offer
 		if err := db.Find(contextBackground, &offers); err != nil {
-			return context.SendString(500, "Ошибка при загрузке офферов")
+			return context.Status(200).Type("text/html").SendString("<div class=error-box>Ошибка при загрузке офферов</div>")
 		}
 
 		// Формируем HTML-ответ
 		response := fmt.Sprintf(`
-			<div id="offer-result" hx-swap-oob="true" style="color:green;">
-				Оффер "%s" успешно добавлен!
-			</div>
+			<div class="success-box"> Оффер "%s" успешно добавлен! </div>
 
 			<select id="offer-select" name="offer_id" hx-swap-oob="true">
 		`, newOffer.Title)
@@ -79,6 +77,6 @@ func OfferPost(db dbifaces.DataBaseProvider) adminifaces.HandlerFunc {
 		}
 		response += "</select>"
 
-		return context.SendString(200, response)
+		return context.Status(200).Type("text/html").SendString(response)
 	}
 }

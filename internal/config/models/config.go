@@ -1,8 +1,10 @@
 package models
 
 type Config struct {
-	Bot      Bot      `mapstructure:"bot"`
-	DataBase DataBase `mapstructure:"db"`
+	Bot           Bot           `mapstructure:"bot"`
+	DataBase      DataBase      `mapstructure:"db"`
+	AdminPanel    AdminPanel    `mapstructure:"admin_panel"`
+	ImageUploader ImageUploader `mapstructure:"image_uploader"`
 }
 
 // Validate проверяет корректность структуры Config, делегируя валидацию полю Bot.

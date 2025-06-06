@@ -18,23 +18,30 @@ type FreeImageUploader struct {
 	logger loggerifaces.Logger
 }
 
-func New(apiKey string, logger loggerifaces.Logger) *FreeImageUploader {
+func NewFreeImageUploader(apiKey string, logger loggerifaces.Logger) *FreeImageUploader {
 	return &FreeImageUploader{
 		apiKey: apiKey,
 		logger: logger,
 	}
 }
 
-type uploadResponse struct {
-	StatusCode int  `json:"status_code"`
-	Success    bool `json:"success"`
-	Image      struct {
-		URL string `json:"url"`
+type UploadResponse struct {
+	StatusCode int `json:"status_code"`
+	Success    struct {
+		Message string `json:"message"`
+		Code    int    `json:"code"`
+	} `json:"success"`
+	Image struct {
+		URL       string `json:"url"`
+		URLViewer string `json:"url_viewer"`
+		Thumb     struct {
+			URL string `json:"url"`
+		} `json:"thumb"`
+		Medium struct {
+			URL string `json:"url"`
+		} `json:"medium"`
 	} `json:"image"`
-}
-
-func NewFreeImageUploader(apiKey string) *FreeImageUploader {
-	return &FreeImageUploader{apiKey: apiKey}
+	StatusTxt string `json:"status_txt"`
 }
 
 func (fiu *FreeImageUploader) UploadImage(file io.Reader, filename string) (string, error) {
@@ -70,12 +77,12 @@ func (fiu *FreeImageUploader) UploadImage(file io.Reader, filename string) (stri
 	}
 	defer responce.Body.Close()
 
-	var responceData uploadResponse
+	var responceData UploadResponse
 	if err := json.NewDecoder(responce.Body).Decode(&responceData); err != nil {
 		return "", err
 	}
 
-	if !responceData.Success {
+	if responceData.Success.Code != 200 {
 		return "", fmt.Errorf("загрузка завершилась неудачей с кодом: %d", responceData.StatusCode)
 	}
 

@@ -14,23 +14,21 @@ func CategoryPost(db dbifaces.DataBaseProvider) adminifaces.HandlerFunc {
 
 		name := context.FormValue("name")
 		if name == "" {
-			return context.SendString(400, "Имя категории обязательно")
+			return context.Type("text/html").Status(200).SendString("<div class=error-box>Имя категории обязательно</div>")
 		}
 
 		newCategory := dbmodels.Category{Name: name}
 		if err := db.Create(contextBackground, &newCategory); err != nil {
-			return context.SendString(500, "Ошибка при создании категории")
+			return context.Type("text/html").Status(200).SendString("<div class=error-box>Ошибка при создании категории</div>")
 		}
 
 		var categories []dbmodels.Category
 		if err := db.Find(contextBackground, &categories); err != nil {
-			return context.SendString(500, "Ошибка при загрузке категорий")
+			return context.Type("text/html").Status(200).SendString("<div class=error-box>Ошибка при загрузке категорий</div>")
 		}
 
 		response := fmt.Sprintf(`
-			<div id="category-result" hx-swap-oob="true" style="color:green;">
-				Категория "%s" успешно добавлена!
-			</div>
+			<div class="success-box">Категория "%s" успешно добавлена!</div>
 
 			<select id="category-select" name="category_id" hx-swap-oob="true">
 		`, newCategory.Name)
@@ -44,6 +42,6 @@ func CategoryPost(db dbifaces.DataBaseProvider) adminifaces.HandlerFunc {
 		}
 		response += "</select>"
 
-		return context.SendString(200, response)
+		return context.Status(200).Type("text/html").SendString(response)
 	}
 }
