@@ -40,7 +40,7 @@ func StartAdminPanel(
 	logger loggerifaces.Logger,
 	context context.Context,
 ) {
-	expectedUsername, expectedPassword, _, templatesExtension, host, port := loaders.LoadAdminPanelConfig(adminPanelConfig)
+	expectedUsername, expectedPassword, templatesExtension, host, port := loaders.LoadAdminPanelConfig(adminPanelConfig)
 	freeimagehostApi := loaders.LoadImageUploaderConfig(imageUploaderConfig)
 
 	address := fmt.Sprintf("%s:%s", host, port)
