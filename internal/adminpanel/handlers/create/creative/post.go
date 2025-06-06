@@ -10,7 +10,6 @@ import (
 	imguploaderifaces "pnBot/internal/imageuploader/interfaces"
 	imageutils "pnBot/internal/imageutils"
 	"strconv"
-	"time"
 )
 
 func CreativePost(db dbifaces.DataBaseProvider, imageUploader imguploaderifaces.ImageUploader) adminifaces.HandlerFunc {
@@ -64,8 +63,6 @@ func CreativePost(db dbifaces.DataBaseProvider, imageUploader imguploaderifaces.
 			ResourceURL:               resourceURL,
 			Width:                     width,
 			Height:                    height,
-			AddedAt:                   time.Now(),
-			UpdatedAt:                 time.Now(),
 		}
 
 		if err := db.Create(contextBackground, &newCreative); err != nil {

@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"strconv"
-	"time"
 
 	adminifaces "pnBot/internal/adminpanel/interfaces"
 	dbifaces "pnBot/internal/db/interfaces"
@@ -57,9 +56,8 @@ func PartnerPost(db dbifaces.DataBaseProvider, imageUploader imguploaderifaces.I
 		}
 
 		newPartner := dbmodels.Partner{
-			Name:      name,
-			LogoURL:   logoURL,
-			CreatedAt: time.Now(),
+			Name:    name,
+			LogoURL: logoURL,
 		}
 
 		if err := db.Create(contextBackground, &newPartner); err != nil {

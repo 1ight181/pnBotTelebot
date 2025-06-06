@@ -11,20 +11,20 @@ type CommandProcessor struct {
 	dependencies *deps.ProcessorDependencies
 }
 
-func New(deps *deps.ProcessorDependencies) *CommandProcessor {
+func New(dependencies *deps.ProcessorDependencies) *CommandProcessor {
 	return &CommandProcessor{
-		dependencies: deps,
+		dependencies: dependencies,
 	}
 }
 
-func (p *CommandProcessor) ProcessCommand(c telebot.Context) error {
+func (cp *CommandProcessor) ProcessCommand(c telebot.Context) error {
 	data := c.Message().Text
 
 	switch data {
 	case "/start":
-		return p.ProcessStart(c)
+		return cp.ProcessStart(c)
 	case "/help":
-		return p.ProcessHelp(c)
+		return cp.ProcessHelp(c)
 	default:
 		return errors.New("Полученно неизвестное сообщение: " + data)
 	}

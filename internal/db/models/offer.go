@@ -14,8 +14,8 @@ type Offer struct {
 	CategoryID             uint              `gorm:"index"`
 	PartnerID              uint              `gorm:"index"`
 	TrackingLink           string
-	AddedAt                time.Time
-	UpdatedAt              time.Time
+	CreatedAt              time.Time `gorm:"autoCreateTime"`
+	UpdatedAt              time.Time `gorm:"autoUpdateTime"`
 	Payout                 float64
 
 	Category  Category

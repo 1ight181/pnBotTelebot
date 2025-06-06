@@ -4,7 +4,6 @@ import (
 	ctx "context"
 	"fmt"
 	"strconv"
-	"time"
 
 	adminifaces "pnBot/internal/adminpanel/interfaces"
 	enums "pnBot/internal/db/enums"
@@ -48,8 +47,6 @@ func OfferPost(db dbifaces.DataBaseProvider) adminifaces.HandlerFunc {
 			PartnerID:              uint(partnerID),
 			TrackingLink:           trackingLink,
 			Payout:                 payout,
-			AddedAt:                time.Now(),
-			UpdatedAt:              time.Now(),
 		}
 
 		if err := db.Create(contextBackground, &newOffer); err != nil {

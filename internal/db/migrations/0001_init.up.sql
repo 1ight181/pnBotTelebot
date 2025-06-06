@@ -17,7 +17,8 @@ CREATE TABLE IF NOT EXISTS partners (
     id SERIAL PRIMARY KEY,
     name TEXT NOT NULL,
     logo_url TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Таблица офферов
@@ -31,7 +32,7 @@ CREATE TABLE IF NOT EXISTS offers (
     partner_id INTEGER REFERENCES partners(id) ON DELETE SET NULL,
     tracking_link TEXT,
     payout DOUBLE PRECISION,
-    added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -44,17 +45,20 @@ CREATE TABLE IF NOT EXISTS creatives (
     resource_url TEXT,
     width INTEGER,
     height INTEGER,
-    added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Таблица пользователей
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
+    tg_id BIGINT UNIQUE NOT NULL,
     chat_id BIGINT UNIQUE NOT NULL,
     username TEXT,
+    name TEXT,
+    is_subscribed BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    is_subscribed BOOLEAN DEFAULT TRUE
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Таблица для many-to-many связи: пользователи - категории

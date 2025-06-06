@@ -10,8 +10,8 @@ type Creative struct {
 	ResourceURL               string
 	Width                     int
 	Height                    int
-	AddedAt                   time.Time
-	UpdatedAt                 time.Time
+	CreatedAt                 time.Time `gorm:"autoCreateTime"`
+	UpdatedAt                 time.Time `gorm:"autoUpdateTime"`
 
 	Offer Offer
 }
