@@ -57,7 +57,7 @@ func PartnerPost(db dbifaces.DataBaseProvider, imageUploader imguploaderifaces.I
 
 		newPartner := dbmodels.Partner{
 			Name:    name,
-			LogoURL: logoURL,
+			LogoUrl: logoURL,
 		}
 
 		if err := db.Create(contextBackground, &newPartner); err != nil {
@@ -76,7 +76,7 @@ func PartnerPost(db dbifaces.DataBaseProvider, imageUploader imguploaderifaces.I
 		`, newPartner.Name)
 
 		for _, partner := range partners {
-			response += `<option value="` + strconv.FormatUint(uint64(partner.ID), 10) + `">` + partner.Name + `</option>`
+			response += `<option value="` + strconv.FormatUint(uint64(partner.Id), 10) + `">` + partner.Name + `</option>`
 		}
 		response += "</select>"
 

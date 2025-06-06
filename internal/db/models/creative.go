@@ -3,11 +3,11 @@ package models
 import "time"
 
 type Creative struct {
-	ID                        uint `gorm:"primaryKey"`
-	PartnerInternalCreativeID string
-	OfferID                   uint `gorm:"index"`
+	Id                        uint `gorm:"primaryKey"`
+	PartnerInternalCreativeId string
+	OfferId                   uint `gorm:"index"`
 	Type                      string
-	ResourceURL               string
+	ResourceUrl               string
 	Width                     int
 	Height                    int
 	CreatedAt                 time.Time `gorm:"autoCreateTime"`

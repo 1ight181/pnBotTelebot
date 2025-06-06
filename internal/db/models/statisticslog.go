@@ -3,11 +3,11 @@ package models
 import "time"
 
 type StatisticsLog struct {
-	ID        uint `gorm:"primaryKey"`
-	UserID    uint `gorm:"index"`
-	OfferID   uint `gorm:"index"`
+	Id        uint `gorm:"primaryKey"`
+	UserId    uint `gorm:"index"`
+	OfferId   uint `gorm:"index"`
 	ClickedAt time.Time
-	IPAddress string
+	IpAddress string
 
 	User  User
 	Offer Offer

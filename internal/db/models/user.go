@@ -3,9 +3,9 @@ package models
 import "time"
 
 type User struct {
-	ID           uint  `gorm:"primaryKey"`
-	TgID         int64 `gorm:"uniqueIndex;not null"` // Telegram User ID
-	ChatID       int64 `gorm:"uniqueIndex;not null"` // Telegram Chat ID
+	Id           uint  `gorm:"primaryKey"`
+	TgId         int64 `gorm:"uniqueIndex;not null"` // Telegram User Id
+	ChatId       int64 `gorm:"uniqueIndex;not null"` // Telegram Chat Id
 	Username     string
 	Fullname     string    //firstnale + lastname
 	CreatedAt    time.Time `gorm:"autoCreateTime"`

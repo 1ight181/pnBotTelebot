@@ -3,6 +3,7 @@ package command
 import (
 	ctx "context"
 	"fmt"
+	"pnBot/internal/bot/processors/keyboards"
 	dbmodels "pnBot/internal/db/models"
 
 	"gopkg.in/telebot.v3"
@@ -22,31 +23,25 @@ func (cp *CommandProcessor) ProcessStart(c telebot.Context) error {
 	}
 
 	var startText string
+	subscribeKeyboard := keyboards.GetSubscribeKeyBoard(cp.dependencies.TextProvider)
+
 	if isUserCreated {
 		startText = cp.dependencies.TextProvider.GetText("first_start")
 	} else {
 		if user.IsSubscribed {
 			startText = cp.dependencies.TextProvider.GetText("not_first_start_subscribed")
-			return c.Send(startText)
+			c.Send(startText)
+
+			menuText := cp.dependencies.TextProvider.GetText("menu")
+			menuKeyboard := keyboards.GetMenuKeyBoard(cp.dependencies.TextProvider)
+
+			return c.Send(menuText, menuKeyboard)
 		} else {
 			startText = cp.dependencies.TextProvider.GetText("not_first_start_not_subscribed")
 		}
 	}
 
-	startKeyboard := &telebot.ReplyMarkup{}
-
-	subscribeButtonText := cp.dependencies.TextProvider.GetButtonText("subscribe")
-
-	subscribeButton := startKeyboard.Data(
-		subscribeButtonText,
-		"subscribe",
-	)
-
-	startKeyboard.Inline(
-		startKeyboard.Row(subscribeButton),
-	)
-
-	return c.Send(startText, startKeyboard)
+	return c.Send(startText, subscribeKeyboard)
 }
 
 func (cp *CommandProcessor) addUserToDb(
@@ -56,10 +51,10 @@ func (cp *CommandProcessor) addUserToDb(
 	name string,
 ) (dbmodels.User, bool, error) {
 	user := dbmodels.User{}
-	where := dbmodels.User{TgID: userId}
+	where := dbmodels.User{TgId: userId}
 	defaults := dbmodels.User{
-		TgID:         userId,
-		ChatID:       chatId,
+		TgId:         userId,
+		ChatId:       chatId,
 		Username:     username,
 		Fullname:     name,
 		IsSubscribed: false,

@@ -35,10 +35,10 @@ func CategoryPost(db dbifaces.DataBaseProvider) adminifaces.HandlerFunc {
 
 		for _, category := range categories {
 			selected := ""
-			if category.ID == newCategory.ID {
+			if category.Id == newCategory.Id {
 				selected = "selected"
 			}
-			response += fmt.Sprintf(`<option value="%d" %s>%s</option>`, category.ID, selected, category.Name)
+			response += fmt.Sprintf(`<option value="%d" %s>%s</option>`, category.Id, selected, category.Name)
 		}
 		response += "</select>"
 

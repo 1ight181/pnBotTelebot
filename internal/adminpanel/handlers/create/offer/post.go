@@ -39,12 +39,12 @@ func OfferPost(db dbifaces.DataBaseProvider) adminifaces.HandlerFunc {
 		payout, _ := strconv.ParseFloat(payoutStr, 64)
 
 		newOffer := dbmodels.Offer{
-			PartnerInternalOfferID: partnerInternalOfferID,
+			PartnerInternalOfferId: partnerInternalOfferID,
 			Title:                  title,
 			Description:            description,
 			Status:                 enums.OfferStatus(statusStr),
-			CategoryID:             uint(categoryID),
-			PartnerID:              uint(partnerID),
+			CategoryId:             uint(categoryID),
+			PartnerId:              uint(partnerID),
 			TrackingLink:           trackingLink,
 			Payout:                 payout,
 		}
@@ -67,10 +67,10 @@ func OfferPost(db dbifaces.DataBaseProvider) adminifaces.HandlerFunc {
 
 		for _, offer := range offers {
 			selected := ""
-			if offer.ID == newOffer.ID {
+			if offer.Id == newOffer.Id {
 				selected = "selected"
 			}
-			response += fmt.Sprintf(`<option value="%d" %s>%s</option>`, offer.ID, selected, offer.Title)
+			response += fmt.Sprintf(`<option value="%d" %s>%s</option>`, offer.Id, selected, offer.Title)
 		}
 		response += "</select>"
 

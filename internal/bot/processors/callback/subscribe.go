@@ -2,6 +2,7 @@ package callback
 
 import (
 	ctx "context"
+	keyboards "pnBot/internal/bot/processors/keyboards"
 	dbmodels "pnBot/internal/db/models"
 
 	"gopkg.in/telebot.v3"
@@ -35,9 +36,12 @@ func (cp *CallbackProcessor) ProcessSubscribe(c telebot.Context) error {
 		}
 	}
 
-	return c.Edit(c.Message().Text, &telebot.SendOptions{
-		ReplyMarkup: &telebot.ReplyMarkup{},
-	})
+	c.Delete()
+
+	menuText := cp.dependencies.TextProvider.GetText("menu")
+	menuKeyboard := keyboards.GetMenuKeyBoard(cp.dependencies.TextProvider)
+
+	return c.Send(menuText, menuKeyboard)
 }
 
 func (cp *CallbackProcessor) setSubscribed(userId int64) (bool, error) {
@@ -45,7 +49,7 @@ func (cp *CallbackProcessor) setSubscribed(userId int64) (bool, error) {
 	user := dbmodels.User{}
 
 	where := dbmodels.User{
-		TgID: userId,
+		TgId: userId,
 	}
 
 	if err := cp.dependencies.DbProvider.Find(context, &user, where); err != nil {

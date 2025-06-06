@@ -25,6 +25,8 @@ func (cp *CommandProcessor) ProcessCommand(c telebot.Context) error {
 		return cp.ProcessStart(c)
 	case "/help":
 		return cp.ProcessHelp(c)
+	case "/menu":
+		return cp.ProcessMenu(c)
 	default:
 		return errors.New("Полученно неизвестное сообщение: " + data)
 	}

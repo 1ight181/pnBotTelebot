@@ -57,10 +57,10 @@ func CreativePost(db dbifaces.DataBaseProvider, imageUploader imguploaderifaces.
 		}
 
 		newCreative := dbmodels.Creative{
-			PartnerInternalCreativeID: partnerID,
-			OfferID:                   uint(offerID),
+			PartnerInternalCreativeId: partnerID,
+			OfferId:                   uint(offerID),
 			Type:                      typeStr,
-			ResourceURL:               resourceURL,
+			ResourceUrl:               resourceURL,
 			Width:                     width,
 			Height:                    height,
 		}

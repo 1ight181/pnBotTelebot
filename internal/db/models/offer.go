@@ -6,13 +6,13 @@ import (
 )
 
 type Offer struct {
-	ID                     uint `gorm:"primaryKey"`
-	PartnerInternalOfferID string
+	Id                     uint `gorm:"primaryKey"`
+	PartnerInternalOfferId string
 	Description            string
 	Title                  string
 	Status                 enums.OfferStatus `gorm:"type:offer_status;index"`
-	CategoryID             uint              `gorm:"index"`
-	PartnerID              uint              `gorm:"index"`
+	CategoryId             uint              `gorm:"index"`
+	PartnerId              uint              `gorm:"index"`
 	TrackingLink           string
 	CreatedAt              time.Time `gorm:"autoCreateTime"`
 	UpdatedAt              time.Time `gorm:"autoUpdateTime"`
