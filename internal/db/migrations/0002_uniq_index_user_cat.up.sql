@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX IF NOT EXISTS idx_user_category_unique ON user_categories (user_id, category_id);
