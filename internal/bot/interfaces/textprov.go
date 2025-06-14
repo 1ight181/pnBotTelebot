@@ -4,6 +4,6 @@ type TextProvider interface {
 	GetButtonText(string) string
 	GetText(string) string
 	GetInlineQueryTitle(string) string
-	GetInlineQueryText(string) string
+	GetInlineQueryDescription(string) string
 	GetCallbackText(string) string
 }

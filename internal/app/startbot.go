@@ -15,13 +15,15 @@ import (
 	callback "pnBot/internal/bot/processors/callback"
 	command "pnBot/internal/bot/processors/command"
 	deps "pnBot/internal/bot/processors/dependencies"
+	"pnBot/internal/bot/processors/inlinequery"
 	loaders "pnBot/internal/config/loaders"
 	models "pnBot/internal/config/models"
+
 	dbifaces "pnBot/internal/db/interfaces"
 	loggerifaces "pnBot/internal/logger/interfaces"
 )
 
-func StartBot(botConfig *models.Bot, logger loggerifaces.Logger, dbProvider dbifaces.DataBaseProvider, ctx context.Context) {
+func StartBot(botConfig *models.Bot, logger loggerifaces.Logger, dbProvider dbifaces.DataBaseProvider, offerDao dbifaces.OfferDao, ctx context.Context) {
 	token, isDebug, port, host, webhookUrl := loaders.LoadBotConfig(*botConfig)
 
 	address := fmt.Sprintf("%s:%s", host, port)
@@ -41,7 +43,12 @@ func StartBot(botConfig *models.Bot, logger loggerifaces.Logger, dbProvider dbif
 		}
 	}
 
-	errorhandler := errorhandler.New(logger)
+	textProvider := CreateTextProvider()
+
+	errorhandler := errorhandler.NewErrorHandler(
+		logger,
+		textProvider,
+	)
 
 	pref := telebot.Settings{
 		Token:     token,
@@ -55,34 +62,41 @@ func StartBot(botConfig *models.Bot, logger loggerifaces.Logger, dbProvider dbif
 		logger.Fatalf("Ошибка при создании telebot: %v", err)
 	}
 
-	textProvider := CreateTextProvider()
-
 	dependenciesOptions := deps.ProcessorDependenciesOptions{
 		TextProvider: textProvider,
 		DbProvider:   dbProvider,
+		OfferDao:     offerDao,
 	}
 
-	dependencies := deps.New(dependenciesOptions)
+	dependencies := deps.NewProcessorDependencies(dependenciesOptions)
 
-	commandProcessor := command.New(dependencies)
-	commandHandler := handlers.New(
+	commandProcessor := command.NewCommandProcessor(dependencies)
+	commandHandler := handlers.NewHandler(
 		telebot.OnText,
 		commandProcessor.ProcessCommand,
 	)
 
-	callbackProcessor := callback.New(dependencies)
-	callbackHandler := handlers.New(
+	callbackProcessor := callback.NewCallbackProcessor(dependencies)
+	callbackHandler := handlers.NewHandler(
 		telebot.OnCallback,
 		callbackProcessor.ProcessCallback,
+	)
+
+	inlineQueryProcessor := inlinequery.NewInlineQueryProcessor(dependencies)
+	inlineQueryHandler := handlers.NewHandler(
+		telebot.OnQuery,
+		inlineQueryProcessor.ProcessInlineQuery,
 	)
 
 	handlers := []ifaces.Handler{
 		commandHandler,
 		callbackHandler,
+		inlineQueryHandler,
 	}
 
 	middlewares := []telebot.MiddlewareFunc{
 		middleware.LogMiddleware(logger),
+		errorhandler.ErrorMiddleware(),
 	}
 
 	botOptions := tb.TelegramBotOptions{

@@ -10,6 +10,7 @@ import (
 
 	loaders "pnBot/internal/config/loaders"
 	models "pnBot/internal/config/models"
+	dbdao "pnBot/internal/db/dao"
 	dbifaces "pnBot/internal/db/interfaces"
 	migrationmanager "pnBot/internal/db/migrations/managers"
 	gormprov "pnBot/internal/db/providers/gorm"
@@ -17,7 +18,7 @@ import (
 	loggerifaces "pnBot/internal/logger/interfaces"
 )
 
-func CreateDataBase(dbConfig models.DataBase, logger loggerifaces.Logger, context context.Context) dbifaces.DataBaseProvider {
+func CreateDataBase(dbConfig models.DataBase, logger loggerifaces.Logger, context context.Context) (dbifaces.DataBaseProvider, dbifaces.OfferDao) {
 	dsn, migrationsPath := loaders.LoadDbConfig(dbConfig)
 
 	gormDB, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
@@ -45,6 +46,8 @@ func CreateDataBase(dbConfig models.DataBase, logger loggerifaces.Logger, contex
 
 	dbProvider := gormprov.New(dbProviderOptions)
 
+	offerDao := dbdao.NewOfferDao(gormDB)
+
 	migrationManager, err := migrationmanager.New(
 		migrationsPath,
 		dsn,
@@ -70,5 +73,5 @@ func CreateDataBase(dbConfig models.DataBase, logger loggerifaces.Logger, contex
 		}
 	}()
 
-	return dbProvider
+	return dbProvider, offerDao
 }

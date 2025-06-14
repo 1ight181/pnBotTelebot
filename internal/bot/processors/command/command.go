@@ -1,7 +1,7 @@
 package command
 
 import (
-	"errors"
+	common "pnBot/internal/bot/processors/common"
 	deps "pnBot/internal/bot/processors/dependencies"
 
 	"gopkg.in/telebot.v3"
@@ -11,13 +11,18 @@ type CommandProcessor struct {
 	dependencies *deps.ProcessorDependencies
 }
 
-func New(dependencies *deps.ProcessorDependencies) *CommandProcessor {
+func NewCommandProcessor(dependencies *deps.ProcessorDependencies) *CommandProcessor {
 	return &CommandProcessor{
 		dependencies: dependencies,
 	}
 }
 
 func (cp *CommandProcessor) ProcessCommand(c telebot.Context) error {
+	if c.Message().Via != nil {
+		if c.Message().Via.IsBot {
+			return nil
+		}
+	}
 	data := c.Message().Text
 
 	switch data {
@@ -26,8 +31,9 @@ func (cp *CommandProcessor) ProcessCommand(c telebot.Context) error {
 	case "/help":
 		return cp.ProcessHelp(c)
 	case "/menu":
-		return cp.ProcessMenu(c)
+		return common.ProcessMenu(c, cp.dependencies.TextProvider, cp.dependencies.DbProvider)
 	default:
-		return errors.New("Полученно неизвестное сообщение: " + data)
+		unknownText := cp.dependencies.TextProvider.GetText("unknown")
+		return c.Send(unknownText)
 	}
 }

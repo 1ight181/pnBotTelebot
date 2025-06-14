@@ -13,7 +13,7 @@ func GetMenuKeyBoard(textProvider ifaces.TextProvider) *telebot.ReplyMarkup {
 
 	lastPromoButton := menuKeyboard.Data(
 		lastPromoButtonText,
-		"lastPromoButton",
+		"last",
 	)
 
 	filterSettingsButtonText := textProvider.GetButtonText("filter_settings")

@@ -7,7 +7,7 @@ type Handler struct {
 	handleFunc telebot.HandlerFunc
 }
 
-func New(
+func NewHandler(
 	endpoint interface{},
 	handleFunc telebot.HandlerFunc,
 ) *Handler {

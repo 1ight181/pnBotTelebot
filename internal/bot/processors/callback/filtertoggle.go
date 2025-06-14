@@ -35,10 +35,9 @@ func (cp *CallbackProcessor) ProcessFilterToggle(c telebot.Context, data string)
 		selectedCategories = append(selectedCategories, currentToggledCategoryId)
 	}
 
-	c.Respond(&telebot.CallbackResponse{
-		Text:      "",
-		ShowAlert: false,
-	})
+	if err := c.Respond(&telebot.CallbackResponse{}); err != nil {
+		return err
+	}
 
 	categoriesKeyboard := keyboards.GetFilterToggleKeyboard(allCategories, selectedCategories, cp.dependencies.TextProvider)
 	categoryFilterText := cp.dependencies.TextProvider.GetText("category_filter")

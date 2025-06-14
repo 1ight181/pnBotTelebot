@@ -71,7 +71,7 @@ CREATE TABLE IF NOT EXISTS user_categories (
 -- Таблица логов статистики
 CREATE TABLE IF NOT EXISTS statistics_logs (
     id SERIAL PRIMARY KEY,
-    user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
     offer_id INTEGER REFERENCES offers(id) ON DELETE SET NULL,
     clicked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     ip_address TEXT

@@ -8,16 +8,19 @@ import (
 type ProcessorDependencies struct {
 	TextProvider botifaces.TextProvider
 	DbProvider   dbifaces.DataBaseProvider
+	OfferDao     dbifaces.OfferDao
 }
 
 type ProcessorDependenciesOptions struct {
 	TextProvider botifaces.TextProvider
 	DbProvider   dbifaces.DataBaseProvider
+	OfferDao     dbifaces.OfferDao
 }
 
-func New(opts ProcessorDependenciesOptions) *ProcessorDependencies {
+func NewProcessorDependencies(opts ProcessorDependenciesOptions) *ProcessorDependencies {
 	return &ProcessorDependencies{
 		TextProvider: opts.TextProvider,
 		DbProvider:   opts.DbProvider,
+		OfferDao:     opts.OfferDao,
 	}
 }

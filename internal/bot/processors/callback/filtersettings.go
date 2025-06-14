@@ -22,10 +22,9 @@ func (cp *CallbackProcessor) ProcessFilterSettings(c telebot.Context) error {
 		return err
 	}
 
-	c.Respond(&telebot.CallbackResponse{
-		Text:      "",
-		ShowAlert: false,
-	})
+	if err := c.Respond(&telebot.CallbackResponse{}); err != nil {
+		return err
+	}
 
 	categoryFilterText := cp.dependencies.TextProvider.GetText("category_filter")
 	categoriesKeyboard := keyboards.GetFilterSettingsKeyboard(allCategories, selectedCategories, cp.dependencies.TextProvider)

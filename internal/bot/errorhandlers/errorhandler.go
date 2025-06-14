@@ -1,37 +1,78 @@
 package errorhandler
 
 import (
-	"context"
-	"pnBot/internal/logger/contextkeys"
+	ctx "context"
+	"fmt"
+	botifaces "pnBot/internal/bot/interfaces"
+	contextkeys "pnBot/internal/logger/contextkeys"
 	loggerifaces "pnBot/internal/logger/interfaces"
 
 	"gopkg.in/telebot.v3"
 )
 
 type ErrorHandler struct {
-	logger loggerifaces.Logger
+	logger       loggerifaces.Logger
+	textprovider botifaces.TextProvider
 }
 
-func New(logger loggerifaces.Logger) *ErrorHandler {
+func NewErrorHandler(logger loggerifaces.Logger, textProvider botifaces.TextProvider) *ErrorHandler {
 	return &ErrorHandler{
-		logger: logger,
+		logger:       logger,
+		textprovider: textProvider,
 	}
 }
 
 func (eh *ErrorHandler) HandleError(err error, c telebot.Context) {
-	userId := c.Sender().ID
-	chatId := c.Chat().ID
+	if err == nil {
+		return
+	}
+	if c == nil {
+		eh.logger.Warnf("Ошибка без контекста: %v", err)
+		return
+	}
 
-	ctx := context.WithValue(context.Background(), contextkeys.UserIDKey, userId)
-	ctx = context.WithValue(ctx, contextkeys.ChatIDKey, chatId)
-	ctx = context.WithValue(ctx, contextkeys.TextKey, c.Text())
-	ctx = context.WithValue(ctx, contextkeys.DataKey, c.Data())
+	context := ctx.Background()
 
-	contextLogger := eh.logger.WithContext(ctx)
+	if sender := c.Sender(); sender != nil {
+		context = ctx.WithValue(context, contextkeys.UserIDKey, sender.ID)
+	}
 
+	if chat := c.Chat(); chat != nil {
+		context = ctx.WithValue(context, contextkeys.ChatIDKey, chat.ID)
+	}
+
+	context = ctx.WithValue(context, contextkeys.TextKey, c.Text())
+	context = ctx.WithValue(context, contextkeys.DataKey, c.Data())
+
+	contextLogger := eh.logger.WithContext(context)
 	contextLogger.Warnf("Ошибка: %v", err)
 
-	if c != nil {
-		c.Send("Произошла ошибка. Попробуйте позже.")
+	errorText := eh.textprovider.GetText("error")
+
+	if sendErr := c.Send(errorText); sendErr != nil {
+		contextLogger.Errorf("Не удалось отправить уведомление об ошибке пользователю: %v", sendErr)
+	}
+}
+
+func (eh *ErrorHandler) ErrorMiddleware() telebot.MiddlewareFunc {
+	return func(next telebot.HandlerFunc) telebot.HandlerFunc {
+		return func(c telebot.Context) error {
+			defer func() {
+				if r := recover(); r != nil {
+					eh.HandleError(fmt.Errorf("panic: %v", r), c)
+					_ = c.Respond(&telebot.CallbackResponse{})
+				}
+			}()
+
+			err := next(c)
+			if err != nil {
+				eh.HandleError(err, c)
+
+				if c.Callback() != nil {
+					_ = c.Respond(&telebot.CallbackResponse{})
+				}
+			}
+			return nil
+		}
 	}
 }

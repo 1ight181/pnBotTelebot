@@ -4,6 +4,16 @@
 		<meta charset="UTF-8" />
 		<title>Администрационная панель</title>
 		<script src="https://unpkg.com/htmx.org@1.9.2"></script>
+		<script>
+			document.addEventListener("DOMContentLoaded", () => {
+				document.body.addEventListener("htmx:afterRequest", function (event) {
+					const responseHTML = event.detail.xhr.responseText;
+					if (responseHTML.includes("success-box")) {
+						event.target.closest("form")?.reset();
+					}
+				});
+			});
+		</script>
 		<style>
 			body {
 				font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
@@ -171,14 +181,14 @@
 			<label for="category-select">Категория:</label>
 			<select id="category-select" name="category_id">
 				{{range .Categories}}
-				<option value="{{.ID}}">{{.Name}}</option>
+				<option value="{{.Id}}">{{.Name}}</option>
 				{{end}}
 			</select>
 
 			<label for="partner-select">Партнёр:</label>
 			<select id="partner-select" name="partner_id">
 				{{range .Partners}}
-				<option value="{{.ID}}">{{.Name}}</option>
+				<option value="{{.Id}}">{{.Name}}</option>
 				{{end}}
 			</select>
 
@@ -211,7 +221,7 @@
 			<label for="offer-select">Оффер:</label>
 			<select id="offer-select" name="offer_id">
 				{{range .Offers}}
-				<option value="{{.ID}}">{{.Title}}</option>
+				<option value="{{.Id}}">{{.Title}}</option>
 				{{end}}
 			</select>
 

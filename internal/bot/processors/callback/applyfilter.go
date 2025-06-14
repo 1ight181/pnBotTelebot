@@ -29,6 +29,10 @@ func (cp *CallbackProcessor) ProcessApplyFilter(c telebot.Context, data string) 
 		return err
 	}
 
+	if err := c.Respond(&telebot.CallbackResponse{}); err != nil {
+		return err
+	}
+
 	menuText := cp.dependencies.TextProvider.GetText("menu")
 	menuKeyboard := keyboards.GetMenuKeyBoard(cp.dependencies.TextProvider)
 

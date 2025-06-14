@@ -59,9 +59,9 @@ func Run() {
 		baseLogger.Fatalf("Ошибка загрузки конфигурации: %v", err)
 	}
 
-	dbProvider := CreateDataBase(config.DataBase, dbLogger, context)
+	dbProvider, offerDao := CreateDataBase(config.DataBase, dbLogger, context)
 
-	StartBot(&config.Bot, botLogger, dbProvider, context)
+	StartBot(&config.Bot, botLogger, dbProvider, offerDao, context)
 
 	StartAdminPanel(config.AdminPanel, config.ImageUploader, dbProvider, adminPanelLogger, context)
 
