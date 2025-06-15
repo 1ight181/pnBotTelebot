@@ -1,9 +1,11 @@
 package interfaces
 
-import dbmodels "pnBot/internal/db/models"
+import (
+	dbmodels "pnBot/internal/db/models"
+	"time"
+)
 
 type OfferDao interface {
-	GetNextAvailableOffer(userId int64) (*dbmodels.Offer, error)
-	GetLastAvailableOffers(userId int64, limit int) ([]dbmodels.Offer, error)
+	GetLastAvailableOffers(userId int64, limit int, offerCooldown time.Time) ([]dbmodels.Offer, error)
 	AddSendingLog(userId int64, offerId uint) error
 }

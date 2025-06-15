@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"time"
 
+	cs "pnBot/internal/scheduler/schedulders"
+
+	c "github.com/robfig/cron/v3"
 	"gopkg.in/telebot.v3"
 
 	tb "pnBot/internal/bot"
@@ -62,10 +65,16 @@ func StartBot(botConfig *models.Bot, logger loggerifaces.Logger, dbProvider dbif
 		logger.Fatalf("Ошибка при создании telebot: %v", err)
 	}
 
+	cronScheduler := cs.NewCronScheduler(
+		c.New(),
+		make(map[int]c.EntryID),
+	)
+
 	dependenciesOptions := deps.ProcessorDependenciesOptions{
 		TextProvider: textProvider,
 		DbProvider:   dbProvider,
 		OfferDao:     offerDao,
+		Scheduler:    cronScheduler,
 	}
 
 	dependencies := deps.NewProcessorDependencies(dependenciesOptions)

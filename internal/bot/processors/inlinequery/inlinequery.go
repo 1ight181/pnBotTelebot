@@ -24,7 +24,8 @@ func (iqp *InlineQueryProcessor) ProcessInlineQuery(c telebot.Context) error {
 		if len(parts) == 1 {
 			return iqp.ProcessLastOne(c)
 		} else if len(parts) == 2 {
-			return iqp.ProcessLastMultiple(c, parts[1])
+			recordCount := parts[1]
+			return iqp.ProcessLastMultiple(c, recordCount)
 		}
 	}
 

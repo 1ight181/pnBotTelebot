@@ -3,6 +3,7 @@ package dao
 import (
 	"errors"
 	"pnBot/internal/db/enums"
+	dberrors "pnBot/internal/db/errors"
 	dbifaces "pnBot/internal/db/interfaces"
 	dbmodels "pnBot/internal/db/models"
 	"time"
@@ -16,47 +17,6 @@ type GormOfferDao struct {
 
 func NewOfferDao(rawDb *gorm.DB) dbifaces.OfferDao {
 	return &GormOfferDao{db: rawDb}
-}
-
-// переписать выборку офферов с настраиваемым ограничением по времени
-func (dao *GormOfferDao) GetNextAvailableOffer(userId int64) (*dbmodels.Offer, error) {
-	var offer dbmodels.Offer
-	var user dbmodels.User
-
-	err := dao.db.Preload("PreferredCategories").Where("tg_id = ?", userId).First(&user).Error
-	if err != nil {
-		return nil, err
-	}
-
-	categoryIDs := make([]uint, 0, len(user.PreferredCategories))
-	for _, cat := range user.PreferredCategories {
-		categoryIDs = append(categoryIDs, cat.Id)
-	}
-
-	if len(categoryIDs) == 0 {
-		return nil, nil
-	}
-
-	err = dao.db.
-		Model(&dbmodels.Offer{}).
-		Joins(`LEFT JOIN sendings_logs 
-		       ON sendings_logs.offer_id = offers.id 
-		      AND sendings_logs.user_id = ? 
-		      AND sendings_logs.created_at > NOW() - INTERVAL '1 day'`, user.Id).
-		Where("sendings_logs.id IS NULL").
-		Where("offers.status = ?", enums.StatusActive).
-		Where("offers.category_id IN ?", categoryIDs).
-		Order("offers.created_at ASC").
-		Preload("Creatives").
-		First(&offer).Error
-
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, nil
-		}
-		return nil, err
-	}
-	return &offer, nil
 }
 
 func (dao *GormOfferDao) AddSendingLog(userId int64, offerId uint) error {
@@ -83,8 +43,7 @@ func (dao *GormOfferDao) AddSendingLog(userId int64, offerId uint) error {
 	return dao.db.Model(&existingLog).Update("created_at", time.Now()).Error
 }
 
-// переписать выборку офферов с настраиваемым ограничением по времени
-func (dao *GormOfferDao) GetLastAvailableOffers(userId int64, limit int) ([]dbmodels.Offer, error) {
+func (dao *GormOfferDao) GetLastAvailableOffers(userId int64, limit int, offerCooldown time.Time) ([]dbmodels.Offer, error) {
 	var offers []dbmodels.Offer
 	var user dbmodels.User
 
@@ -104,6 +63,10 @@ func (dao *GormOfferDao) GetLastAvailableOffers(userId int64, limit int) ([]dbmo
 
 	err = dao.db.
 		Model(&dbmodels.Offer{}).
+		Joins(`LEFT JOIN sendings_logs 
+		       ON sendings_logs.offer_id = offers.id 
+		      AND sendings_logs.user_id = ? 
+		      AND sendings_logs.created_at > NOW() - ? `, user.Id, offerCooldown).
 		Where("offers.status = ?", enums.StatusActive).
 		Where("offers.category_id IN ?", categoryIDs).
 		Order("offers.created_at DESC").
@@ -112,6 +75,9 @@ func (dao *GormOfferDao) GetLastAvailableOffers(userId int64, limit int) ([]dbmo
 		Find(&offers).Error
 
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, dberrors.ErrRecordNotFound
+		}
 		return nil, err
 	}
 

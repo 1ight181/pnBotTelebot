@@ -1,26 +1,31 @@
 package inlinequery
 
 import (
+	"errors"
 	"fmt"
 	"pnBot/internal/bot/processors/common"
 	"strconv"
+	"time"
+
+	dberrors "pnBot/internal/db/errors"
 
 	"gopkg.in/telebot.v3"
 )
 
-func (iqp *InlineQueryProcessor) ProcessLastMultiple(c telebot.Context, countStr string) error {
+func (iqp *InlineQueryProcessor) ProcessLastMultiple(c telebot.Context, recordCount string) error {
 	userId := c.Sender().ID
 
-	limit, err := strconv.Atoi(countStr)
+	limit, err := strconv.Atoi(recordCount)
 	if err != nil || limit <= 0 {
-		limit = 5 // дефолтное число
+		limit = 5
 	}
 	if limit > 50 {
-		limit = 50 // максимум 50
+		limit = 50
 	}
 
-	offers, err := iqp.dependencies.OfferDao.GetLastAvailableOffers(userId, limit)
-	if err != nil || len(offers) == 0 {
+	offerCooldown := time.Now().Add(-iqp.dependencies.OfferCooldownDuration)
+	offers, err := iqp.dependencies.OfferDao.GetLastAvailableOffers(userId, limit, offerCooldown)
+	if errors.Is(err, dberrors.ErrRecordNotFound) {
 		title := iqp.dependencies.TextProvider.GetInlineQueryTitle("no_available_offer")
 		description := iqp.dependencies.TextProvider.GetInlineQueryDescription("no_available_offer")
 		result := &telebot.ArticleResult{
@@ -33,6 +38,22 @@ func (iqp *InlineQueryProcessor) ProcessLastMultiple(c telebot.Context, countStr
 			Results:   []telebot.Result{result},
 			CacheTime: 1,
 		})
+	} else if err != nil {
+		errorTitle := iqp.dependencies.TextProvider.GetInlineQueryTitle("error")
+		errorDescription := iqp.dependencies.TextProvider.GetInlineQueryDescription("error")
+		result := &telebot.ArticleResult{
+			Title:       errorTitle,
+			Description: errorDescription,
+			Text:        common.EscapeMarkdownV2(errorDescription),
+		}
+		result.SetResultID("error")
+		if answerErr := c.Answer(&telebot.QueryResponse{
+			Results:   []telebot.Result{result},
+			CacheTime: 1,
+		}); answerErr != nil {
+			return answerErr
+		}
+		return err
 	}
 
 	results := make([]telebot.Result, 0, len(offers))

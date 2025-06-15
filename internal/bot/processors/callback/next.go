@@ -1,10 +1,13 @@
 package callback
 
 import (
+	"errors"
 	"fmt"
 	"pnBot/internal/bot/processors/common"
 	"pnBot/internal/bot/processors/keyboards"
+	dberrors "pnBot/internal/db/errors"
 	dbmodels "pnBot/internal/db/models"
+	"time"
 
 	"gopkg.in/telebot.v3"
 )
@@ -12,12 +15,10 @@ import (
 func (cp *CallbackProcessor) ProccesNext(c telebot.Context) error {
 	userId := c.Sender().ID
 
-	offer, err := cp.dependencies.OfferDao.GetNextAvailableOffer(userId)
-	if err != nil {
-		return err
-	}
-
-	if offer == nil {
+	offerCooldown := time.Now().Add(-cp.dependencies.OfferCooldownDuration)
+	limit := 1
+	offers, err := cp.dependencies.OfferDao.GetLastAvailableOffers(userId, limit, offerCooldown)
+	if errors.Is(err, dberrors.ErrRecordNotFound) {
 		noAvailableOfferText := cp.dependencies.TextProvider.GetText("no_available_offer")
 		if err := c.Respond(&telebot.CallbackResponse{}); err != nil {
 			return err
@@ -33,7 +34,11 @@ func (cp *CallbackProcessor) ProccesNext(c telebot.Context) error {
 		c.Send(noAvailableOfferText)
 
 		return common.ProcessMenu(c, cp.dependencies.TextProvider, cp.dependencies.DbProvider)
+	} else if err != nil {
+		return err
 	}
+
+	offer := offers[0]
 
 	offerCreatives := offer.Creatives
 
