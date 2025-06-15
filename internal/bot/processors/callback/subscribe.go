@@ -2,6 +2,7 @@ package callback
 
 import (
 	keyboards "pnBot/internal/bot/processors/keyboards"
+	units "pnBot/internal/notifier/units"
 
 	"gopkg.in/telebot.v3"
 )
@@ -37,6 +38,9 @@ func (cp *CallbackProcessor) ProcessSubscribe(c telebot.Context) error {
 			return err
 		}
 	}
+	frequency := 4
+	frequencyUnit := units.Hours
+	cp.dependencies.Notifier.AddUser(userId, frequency, cp.dependencies.OfferCooldownDuration, frequencyUnit)
 
 	menuText := cp.dependencies.TextProvider.GetText("menu")
 	menuKeyboard := keyboards.GetMenuKeyBoard(cp.dependencies.TextProvider)

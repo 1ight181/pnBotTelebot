@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	cs "pnBot/internal/scheduler/schedulders"
+	cs "pnBot/internal/scheduler/schedulers/cron"
 
 	c "github.com/robfig/cron/v3"
 	"gopkg.in/telebot.v3"
@@ -21,6 +21,8 @@ import (
 	"pnBot/internal/bot/processors/inlinequery"
 	loaders "pnBot/internal/config/loaders"
 	models "pnBot/internal/config/models"
+
+	tgnotifier "pnBot/internal/notifier/telegram"
 
 	dbifaces "pnBot/internal/db/interfaces"
 	loggerifaces "pnBot/internal/logger/interfaces"
@@ -70,11 +72,22 @@ func StartBot(botConfig *models.Bot, logger loggerifaces.Logger, dbProvider dbif
 		make(map[int]c.EntryID),
 	)
 
+	telegramNotifierOptions := tgnotifier.TelegramNotifierOptions{
+		DbProvider: dbProvider,
+		OfferDao:   offerDao,
+		Scheduler:  cronScheduler,
+		Logger:     logger,
+		Bot:        botApi,
+	}
+
+	telegramNotifier := tgnotifier.NewTelegramNotifier(telegramNotifierOptions)
+
 	dependenciesOptions := deps.ProcessorDependenciesOptions{
-		TextProvider: textProvider,
-		DbProvider:   dbProvider,
-		OfferDao:     offerDao,
-		Scheduler:    cronScheduler,
+		TextProvider:          textProvider,
+		DbProvider:            dbProvider,
+		OfferDao:              offerDao,
+		OfferCooldownDuration: time.Hour * 24,
+		Notifier:              telegramNotifier,
 	}
 
 	dependencies := deps.NewProcessorDependencies(dependenciesOptions)

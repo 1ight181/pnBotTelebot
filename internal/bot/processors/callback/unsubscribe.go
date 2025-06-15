@@ -12,11 +12,17 @@ func (cp *CallbackProcessor) ProcessUnsubscribe(c telebot.Context) error {
 		return err
 	}
 
+	if err := cp.dependencies.Notifier.RemoveUser(userId); err != nil {
+		return err
+	}
+
 	unsubscribeText := cp.dependencies.TextProvider.GetCallbackText("unsubscribe")
-	c.Respond(&telebot.CallbackResponse{
+	if err := c.Respond(&telebot.CallbackResponse{
 		Text:      unsubscribeText,
 		ShowAlert: false,
-	})
+	}); err != nil {
+		return err
+	}
 
 	return c.Delete()
 }
