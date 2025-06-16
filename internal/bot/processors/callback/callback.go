@@ -26,6 +26,15 @@ func (cp *CallbackProcessor) ProcessCallback(c telebot.Context) (err error) {
 		}
 	}()
 
+	processingText := cp.dependencies.TextProvider.GetText("processing")
+	message, err := c.Bot().Send(c.Chat(), processingText, &telebot.ReplyMarkup{RemoveKeyboard: true})
+	if err != nil {
+		return err
+	}
+	defer func() {
+		c.Bot().Delete(message)
+	}()
+
 	rawData := c.Callback().Data
 	data := strings.TrimPrefix(rawData, "\f")
 
@@ -42,6 +51,8 @@ func (cp *CallbackProcessor) ProcessCallback(c telebot.Context) (err error) {
 		return cp.ProcessUnsubscribe(c)
 	case "filter_settings":
 		return cp.ProcessFilterSettings(c)
+	case "frequency_settings":
+		return cp.ProcessFrequencySettings(c)
 	default:
 		if strings.HasPrefix(data, "filter|") {
 			return cp.ProcessFilterToggle(c, data)

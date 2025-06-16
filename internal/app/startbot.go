@@ -7,6 +7,8 @@ import (
 
 	cs "pnBot/internal/scheduler/schedulers/cron"
 
+	units "pnBot/internal/notifier/units"
+
 	c "github.com/robfig/cron/v3"
 	"gopkg.in/telebot.v3"
 
@@ -73,21 +75,35 @@ func StartBot(botConfig *models.Bot, logger loggerifaces.Logger, dbProvider dbif
 	)
 
 	telegramNotifierOptions := tgnotifier.TelegramNotifierOptions{
-		DbProvider: dbProvider,
-		OfferDao:   offerDao,
-		Scheduler:  cronScheduler,
-		Logger:     logger,
-		Bot:        botApi,
+		DbProvider:            dbProvider,
+		OfferDao:              offerDao,
+		Scheduler:             cronScheduler,
+		Logger:                logger,
+		Bot:                   botApi,
+		DefaultFrequency:      4,
+		FrequencyUnit:         units.Hours,
+		OfferCooldownDuration: 2 * time.Second,
 	}
 
 	telegramNotifier := tgnotifier.NewTelegramNotifier(telegramNotifierOptions)
+	if err := telegramNotifier.Start(); err != nil {
+		logger.Fatalf("Ошибка при запуске TelegramNotifier: %v", err)
+	}
+	logger.Info("TelegramNotifier запущен")
+
+	go func() {
+		<-ctx.Done()
+		if err := telegramNotifier.Stop(); err != nil {
+			logger.Errorf("Ошибка при завершении работы TelegramNotifier: %v", err)
+		}
+		logger.Info("TelegramNotifier завершил работу")
+	}()
 
 	dependenciesOptions := deps.ProcessorDependenciesOptions{
-		TextProvider:          textProvider,
-		DbProvider:            dbProvider,
-		OfferDao:              offerDao,
-		OfferCooldownDuration: time.Hour * 24,
-		Notifier:              telegramNotifier,
+		TextProvider: textProvider,
+		DbProvider:   dbProvider,
+		OfferDao:     offerDao,
+		Notifier:     telegramNotifier,
 	}
 
 	dependencies := deps.NewProcessorDependencies(dependenciesOptions)

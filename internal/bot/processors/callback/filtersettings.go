@@ -7,9 +7,6 @@ import (
 )
 
 func (cp *CallbackProcessor) ProcessFilterSettings(c telebot.Context) error {
-	keyboard := telebot.ReplyMarkup{}
-	c.Edit("Обработка, подождите...", &keyboard)
-
 	userId := c.Sender().ID
 
 	allCategories, err := cp.getCategories()

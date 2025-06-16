@@ -14,6 +14,14 @@ import (
 
 func (cp *CallbackProcessor) ProccesNext(c telebot.Context) error {
 	userId := c.Sender().ID
+	isSubscribed, err := common.IsSubscribed(userId, cp.dependencies.DbProvider)
+	if err != nil {
+		return err
+	}
+	if !isSubscribed {
+		notSubscribedText := cp.dependencies.TextProvider.GetText("not_subscribed")
+		return c.Send(notSubscribedText)
+	}
 
 	offerCooldown := time.Now().Add(-cp.dependencies.OfferCooldownDuration)
 	limit := 1
@@ -66,7 +74,7 @@ func (cp *CallbackProcessor) ProccesNext(c telebot.Context) error {
 		return err
 	}
 
-	err = c.EditCaption(c.Text(), &telebot.SendOptions{
+	err = c.EditCaption(c.Message().Caption, &telebot.SendOptions{
 		Entities: c.Entities(),
 	})
 	if err != nil {

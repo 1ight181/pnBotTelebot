@@ -8,17 +8,6 @@ import (
 )
 
 func (cp *CallbackProcessor) ProcessFilterToggle(c telebot.Context, data string) error {
-	disabledKeyboard := telebot.ReplyMarkup{}
-	processText := cp.dependencies.TextProvider.GetText("process")
-
-	btn := disabledKeyboard.Data(processText, "", "")
-	disabledKeyboard.Inline(disabledKeyboard.Row(btn))
-
-	err := c.Edit("Подождите, идет обработка", &disabledKeyboard)
-	if err != nil {
-		return err
-	}
-
 	allCategories, err := cp.getCategories()
 	if err != nil {
 		return err

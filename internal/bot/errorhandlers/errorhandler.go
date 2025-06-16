@@ -49,6 +49,10 @@ func (eh *ErrorHandler) HandleError(err error, c telebot.Context) {
 
 	errorText := eh.textprovider.GetText("error")
 
+	if err := c.Delete(); err != nil {
+		contextLogger.Errorf("Не удалось удалить последнее сообщение при отправке сообщения об ошибке: %v", err)
+	}
+
 	if sendErr := c.Send(errorText); sendErr != nil {
 		contextLogger.Errorf("Не удалось отправить уведомление об ошибке пользователю: %v", sendErr)
 	}

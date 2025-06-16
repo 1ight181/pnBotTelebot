@@ -58,27 +58,28 @@ func (dao *GormOfferDao) GetLastAvailableOffers(userId int64, limit int, offerCo
 	}
 
 	if len(categoryIDs) == 0 {
-		return nil, nil
+		return nil, dberrors.ErrRecordNotFound
 	}
 
 	err = dao.db.
 		Model(&dbmodels.Offer{}).
-		Joins(`LEFT JOIN sendings_logs 
-		       ON sendings_logs.offer_id = offers.id 
-		      AND sendings_logs.user_id = ? 
-		      AND sendings_logs.created_at > NOW() - ? `, user.Id, offerCooldown).
+		Joins(`
+		LEFT JOIN sendings_logs 
+		ON sendings_logs.offer_id = offers.id 
+		AND sendings_logs.user_id = ? 
+		AND sendings_logs.created_at > ?`, user.Id, offerCooldown).
 		Where("offers.status = ?", enums.StatusActive).
 		Where("offers.category_id IN ?", categoryIDs).
+		Where("sendings_logs.id IS NULL").
 		Order("offers.created_at DESC").
 		Limit(limit).
 		Preload("Creatives").
 		Find(&offers).Error
-
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, dberrors.ErrRecordNotFound
-		}
 		return nil, err
+	}
+	if len(offers) == 0 {
+		return nil, dberrors.ErrRecordNotFound
 	}
 
 	return offers, nil

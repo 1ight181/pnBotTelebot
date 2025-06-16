@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-func isSubscribed(userId int64, dbProvider dbifaces.DataBaseProvider) (bool, error) {
+func IsSubscribed(userId int64, dbProvider dbifaces.DataBaseProvider) (bool, error) {
 	user := dbmodels.User{
 		TgId: userId,
 	}

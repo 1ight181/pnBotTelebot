@@ -23,6 +23,13 @@ func GetMenuKeyBoard(textProvider ifaces.TextProvider) *telebot.ReplyMarkup {
 		"filter_settings",
 	)
 
+	frequencySettingsButtonText := textProvider.GetButtonText("frequency_settings")
+
+	frequencySettingsButton := menuKeyboard.Data(
+		frequencySettingsButtonText,
+		"frequency_settings",
+	)
+
 	unsubscribeButtonText := textProvider.GetButtonText("unsubscribe")
 
 	unsubscribeButton := menuKeyboard.Data(
@@ -33,6 +40,7 @@ func GetMenuKeyBoard(textProvider ifaces.TextProvider) *telebot.ReplyMarkup {
 	menuKeyboard.Inline(
 		menuKeyboard.Row(lastPromoButton),
 		menuKeyboard.Row(filterSettingsButton),
+		menuKeyboard.Row(frequencySettingsButton),
 		menuKeyboard.Row(unsubscribeButton),
 	)
 

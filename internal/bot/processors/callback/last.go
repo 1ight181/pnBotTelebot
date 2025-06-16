@@ -15,6 +15,15 @@ import (
 func (cp *CallbackProcessor) ProccesLast(c telebot.Context) error {
 	userId := c.Sender().ID
 
+	isSubscribed, err := common.IsSubscribed(userId, cp.dependencies.DbProvider)
+	if err != nil {
+		return err
+	}
+	if !isSubscribed {
+		notSubscribedText := cp.dependencies.TextProvider.GetText("not_subscribed")
+		return c.Send(notSubscribedText)
+	}
+
 	offerCooldown := time.Now().Add(-cp.dependencies.OfferCooldownDuration)
 	limit := 1
 	offers, err := cp.dependencies.OfferDao.GetLastAvailableOffers(userId, limit, offerCooldown)
@@ -57,7 +66,7 @@ func (cp *CallbackProcessor) ProccesLast(c telebot.Context) error {
 		return err
 	}
 
-	if err := c.Send(offerMessage, nextOfferKeyboard); err != nil {
+	if err := c.Edit(offerMessage, nextOfferKeyboard); err != nil {
 		return err
 	}
 

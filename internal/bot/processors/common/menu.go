@@ -10,25 +10,13 @@ import (
 
 func ProcessMenu(c telebot.Context, textProvider botifaces.TextProvider, dbProvider dbifaces.DataBaseProvider) error {
 	userId := c.Sender().ID
-	isSubscribed, err := isSubscribed(userId, dbProvider)
+	isSubscribed, err := IsSubscribed(userId, dbProvider)
 	if err != nil {
 		return err
 	}
 	if !isSubscribed {
-		notAllowedText := textProvider.GetText("not_allowed")
-		subscribeKeyboard := &telebot.ReplyMarkup{}
-
-		subscribeButtonText := textProvider.GetButtonText("subscribe")
-
-		subscribeButton := subscribeKeyboard.Data(
-			subscribeButtonText,
-			"subscribe",
-		)
-
-		subscribeKeyboard.Inline(
-			subscribeKeyboard.Row(subscribeButton),
-		)
-		return c.Send(notAllowedText, subscribeKeyboard)
+		notSubscribedText := textProvider.GetText("not_subscribed")
+		return c.Send(notSubscribedText, &telebot.ReplyMarkup{RemoveKeyboard: true})
 	}
 
 	menuText := textProvider.GetText("menu")
