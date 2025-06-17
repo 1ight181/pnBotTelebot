@@ -3,19 +3,19 @@ package errorhandler
 import (
 	ctx "context"
 	"fmt"
-	botifaces "pnBot/internal/bot/interfaces"
 	contextkeys "pnBot/internal/logger/contextkeys"
 	loggerifaces "pnBot/internal/logger/interfaces"
+	textproviface "pnBot/internal/textprovider/interfaces"
 
 	"gopkg.in/telebot.v3"
 )
 
 type ErrorHandler struct {
 	logger       loggerifaces.Logger
-	textprovider botifaces.TextProvider
+	textprovider textproviface.TextProvider
 }
 
-func NewErrorHandler(logger loggerifaces.Logger, textProvider botifaces.TextProvider) *ErrorHandler {
+func NewErrorHandler(logger loggerifaces.Logger, textProvider textproviface.TextProvider) *ErrorHandler {
 	return &ErrorHandler{
 		logger:       logger,
 		textprovider: textProvider,

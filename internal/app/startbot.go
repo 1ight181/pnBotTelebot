@@ -1,13 +1,11 @@
 package app
 
 import (
-	"context"
+	ctx "context"
 	"fmt"
 	"time"
 
 	cs "pnBot/internal/scheduler/schedulers/cron"
-
-	units "pnBot/internal/notifier/units"
 
 	c "github.com/robfig/cron/v3"
 	"gopkg.in/telebot.v3"
@@ -24,13 +22,15 @@ import (
 	loaders "pnBot/internal/config/loaders"
 	models "pnBot/internal/config/models"
 
+	fsm "pnBot/internal/fsm/inmemory"
 	tgnotifier "pnBot/internal/notifier/telegram"
+	email "pnBot/internal/sender/email"
 
 	dbifaces "pnBot/internal/db/interfaces"
 	loggerifaces "pnBot/internal/logger/interfaces"
 )
 
-func StartBot(botConfig *models.Bot, logger loggerifaces.Logger, dbProvider dbifaces.DataBaseProvider, offerDao dbifaces.OfferDao, ctx context.Context) {
+func StartBot(botConfig *models.Bot, notifierConfig *models.Notifier, smtpConfig *models.Smtp, logger loggerifaces.Logger, dbProvider dbifaces.DataBaseProvider, offerDao dbifaces.OfferDao, context ctx.Context) {
 	token, isDebug, port, host, webhookUrl := loaders.LoadBotConfig(*botConfig)
 
 	address := fmt.Sprintf("%s:%s", host, port)
@@ -74,15 +74,17 @@ func StartBot(botConfig *models.Bot, logger loggerifaces.Logger, dbProvider dbif
 		make(map[int]c.EntryID),
 	)
 
+	offerCooldown, defaultFrequency, frequencyUnit := loaders.LoadNotifierConfig(*notifierConfig)
+
 	telegramNotifierOptions := tgnotifier.TelegramNotifierOptions{
 		DbProvider:            dbProvider,
 		OfferDao:              offerDao,
 		Scheduler:             cronScheduler,
 		Logger:                logger,
 		Bot:                   botApi,
-		DefaultFrequency:      4,
-		FrequencyUnit:         units.Hours,
-		OfferCooldownDuration: 2 * time.Second,
+		DefaultFrequency:      defaultFrequency,
+		FrequencyUnit:         frequencyUnit,
+		OfferCooldownDuration: offerCooldown * time.Hour,
 	}
 
 	telegramNotifier := tgnotifier.NewTelegramNotifier(telegramNotifierOptions)
@@ -92,18 +94,34 @@ func StartBot(botConfig *models.Bot, logger loggerifaces.Logger, dbProvider dbif
 	logger.Info("TelegramNotifier запущен")
 
 	go func() {
-		<-ctx.Done()
+		<-context.Done()
 		if err := telegramNotifier.Stop(); err != nil {
 			logger.Errorf("Ошибка при завершении работы TelegramNotifier: %v", err)
 		}
 		logger.Info("TelegramNotifier завершил работу")
 	}()
 
+	fsm := fsm.NewInMemoryStateManager()
+
+	host, port, from, password, to := loaders.LoadSmtpConfig(*smtpConfig)
+
+	emailSenderOptions := email.SmtpEmailSenderOptions{
+		Host:       host,
+		Port:       port,
+		From:       from,
+		Password:   password,
+		AdminEmail: to,
+	}
+
+	emailSender := email.NewSmptEmailSender(emailSenderOptions)
+
 	dependenciesOptions := deps.ProcessorDependenciesOptions{
 		TextProvider: textProvider,
 		DbProvider:   dbProvider,
 		OfferDao:     offerDao,
 		Notifier:     telegramNotifier,
+		Fsm:          fsm,
+		EmailSender:  emailSender,
 	}
 
 	dependencies := deps.NewProcessorDependencies(dependenciesOptions)
@@ -141,7 +159,7 @@ func StartBot(botConfig *models.Bot, logger loggerifaces.Logger, dbProvider dbif
 		BotApi:      botApi,
 		Handlers:    handlers,
 		Middlewares: middlewares,
-		Context:     ctx,
+		Context:     context,
 		Logger:      logger,
 	}
 

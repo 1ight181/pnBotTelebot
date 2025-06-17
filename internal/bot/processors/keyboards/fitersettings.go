@@ -2,9 +2,9 @@ package keyboards
 
 import (
 	"fmt"
-	botifaces "pnBot/internal/bot/interfaces"
 	"pnBot/internal/db/models"
 	"pnBot/internal/sliceutils"
+	textproviface "pnBot/internal/textprovider/interfaces"
 	"strings"
 
 	"gopkg.in/telebot.v3"
@@ -13,7 +13,7 @@ import (
 func GetFilterSettingsKeyboard(
 	allCategories []models.Category,
 	selectedCategories []models.Category,
-	textProvider botifaces.TextProvider,
+	textProvider textproviface.TextProvider,
 ) telebot.ReplyMarkup {
 	var selectedCategoriesIdsParts []string
 	var selectedCategorisIdsComparable []int

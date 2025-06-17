@@ -53,6 +53,10 @@ func (cp *CallbackProcessor) ProcessCallback(c telebot.Context) (err error) {
 		return cp.ProcessFilterSettings(c)
 	case "frequency_settings":
 		return cp.ProcessFrequencySettings(c)
+	case "feedback":
+		return cp.ProcessFeedback(c)
+	case "bug_report":
+		return cp.ProcessBugReport(c)
 	default:
 		if strings.HasPrefix(data, "filter|") {
 			return cp.ProcessFilterToggle(c, data)

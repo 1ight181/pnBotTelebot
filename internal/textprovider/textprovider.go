@@ -6,6 +6,7 @@ type TextProvider struct {
 	inlineQueryTitles       map[string]string
 	inlineQueryDescriptions map[string]string
 	callbackTexts           map[string]string
+	emailSubject            map[string]string
 }
 
 type TextProviderOptions struct {
@@ -14,6 +15,7 @@ type TextProviderOptions struct {
 	InlineQueryTitles       map[string]string
 	InlineQueryDescriptions map[string]string
 	CallbackTexts           map[string]string
+	EmailSubject            map[string]string
 }
 
 func NewTextProvider(opts TextProviderOptions) *TextProvider {
@@ -23,6 +25,7 @@ func NewTextProvider(opts TextProviderOptions) *TextProvider {
 		inlineQueryTitles:       opts.InlineQueryTitles,
 		inlineQueryDescriptions: opts.InlineQueryDescriptions,
 		callbackTexts:           opts.CallbackTexts,
+		emailSubject:            opts.EmailSubject,
 	}
 }
 
@@ -56,6 +59,13 @@ func (tp *TextProvider) GetInlineQueryDescription(key string) string {
 
 func (tp *TextProvider) GetCallbackText(key string) string {
 	if text, exists := tp.callbackTexts[key]; exists {
+		return text
+	}
+	return "Неизвестный текст"
+}
+
+func (tp *TextProvider) GetEmailSubject(key string) string {
+	if text, exists := tp.emailSubject[key]; exists {
 		return text
 	}
 	return "Неизвестный текст"

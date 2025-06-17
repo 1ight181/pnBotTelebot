@@ -1,12 +1,12 @@
 package keyboards
 
 import (
-	ifaces "pnBot/internal/bot/interfaces"
+	textproviface "pnBot/internal/textprovider/interfaces"
 
 	"gopkg.in/telebot.v3"
 )
 
-func GetSubscribeKeyBoard(textProvider ifaces.TextProvider) *telebot.ReplyMarkup {
+func GetSubscribeKeyBoard(textProvider textproviface.TextProvider) *telebot.ReplyMarkup {
 	subscribeKeyboard := &telebot.ReplyMarkup{}
 
 	subscribeButtonText := textProvider.GetButtonText("subscribe")

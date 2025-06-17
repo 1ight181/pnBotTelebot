@@ -1,8 +1,8 @@
 package app
 
 import (
-	textproviface "pnBot/internal/bot/interfaces"
-	textprov "pnBot/internal/bot/textprovider"
+	textprov "pnBot/internal/textprovider"
+	textproviface "pnBot/internal/textprovider/interfaces"
 )
 
 func CreateTextProvider() textproviface.TextProvider {
@@ -17,9 +17,7 @@ func CreateTextProvider() textproviface.TextProvider {
 
 		"help": "Доступные команды:\n\n" +
 			"/start \\- начать работу с ботом\n" +
-			"/help \\- показать это сообщение\n" +
-			"/feedback \\- оставить отзыв или предложение\n\n" +
-			"Мы всегда рады твоим сообщениям\\! 💬",
+			"/help \\- показать это сообщение\n",
 
 		"menu": "🏠 *Главное меню*\n\nВыбери действие ниже, чтобы продолжить 👇",
 
@@ -32,6 +30,12 @@ func CreateTextProvider() textproviface.TextProvider {
 		"frequency_settings": "Настрой частоту уведомлений\\:",
 		"frequency_setted":   "Частота уведомлений успешно изменена\\!",
 		"not_subscribed":     "Ты не подписан на уведомления\\! Напиши /start\\!",
+		"feedback_hint":      "Напиши свой отзыв или пожелания по боту\\. Мы все читаем\\!🌝",
+		"bug_report_hint": "Напиши об ошибке, которую ты обнаружил\\. Постарайся ответить на следующие вопросы:\n" +
+			"⭐️Как проявляется ошибка? \\(появилось соощение об ошибке, некорректное поведение и т\\.п\\.\\)\n" +
+			"⭐️Какое именно действие вызвало проблему? \\(ты нажал кнопку, вызвал какую\\-то команду и т\\.д\\.\\)\n" +
+			"⭐️Что ты делал до того, как появилась ошибка? \\(по возможности опиши свои последние действия до того, как возникла ошибка\\)\n" +
+			"⭐️Повторялась ли ошибка?\n",
 	}
 
 	buttonTexts := map[string]string{
@@ -46,6 +50,7 @@ func CreateTextProvider() textproviface.TextProvider {
 		"feedback":           "Оставить отзыв 💬",
 		"every_x_hours":      "Каждые %d ч. ⏳",
 		"everyday":           "Каждый день 🌅",
+		"bug_report":         "Сообщить об ошибке 🐛",
 	}
 
 	inlineQueryTitles := map[string]string{
@@ -70,12 +75,18 @@ func CreateTextProvider() textproviface.TextProvider {
 		"already_subscribed": "Ты уже подписан! 👍",
 	}
 
+	emailSubject := map[string]string{
+		"feedback":   "Новый отзыв из Promo",
+		"bug_report": "Новый отчет об ошибке из Promo",
+	}
+
 	textProviderOpts := textprov.TextProviderOptions{
 		Texts:                   texts,
 		ButtonTexts:             buttonTexts,
 		InlineQueryTitles:       inlineQueryTitles,
 		InlineQueryDescriptions: inlineQueryDescription,
 		CallbackTexts:           callbackTexts,
+		EmailSubject:            emailSubject,
 	}
 
 	return textprov.NewTextProvider(textProviderOpts)

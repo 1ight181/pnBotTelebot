@@ -2,12 +2,12 @@ package keyboards
 
 import (
 	"fmt"
-	botifaces "pnBot/internal/bot/interfaces"
+	textproviface "pnBot/internal/textprovider/interfaces"
 
 	"gopkg.in/telebot.v3"
 )
 
-func GetFrequencyKeyboard(textprovider botifaces.TextProvider) *telebot.ReplyMarkup {
+func GetFrequencyKeyboard(textprovider textproviface.TextProvider) *telebot.ReplyMarkup {
 	frequencyKeyboard := &telebot.ReplyMarkup{
 		ResizeKeyboard:  true,
 		OneTimeKeyboard: true,

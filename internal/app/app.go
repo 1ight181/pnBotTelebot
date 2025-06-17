@@ -61,7 +61,7 @@ func Run() {
 
 	dbProvider, offerDao := CreateDataBase(config.DataBase, dbLogger, context)
 
-	StartBot(&config.Bot, botLogger, dbProvider, offerDao, context)
+	StartBot(&config.Bot, &config.Notifier, &config.Smtp, botLogger, dbProvider, offerDao, context)
 
 	StartAdminPanel(config.AdminPanel, config.ImageUploader, dbProvider, adminPanelLogger, context)
 

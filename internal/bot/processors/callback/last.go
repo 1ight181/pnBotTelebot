@@ -61,7 +61,7 @@ func (cp *CallbackProcessor) ProccesLast(c telebot.Context) error {
 		Caption: fmt.Sprintf("*%s* \n\n%s", escapedTitle, escapedDescription),
 	}
 
-	nextOfferKeyboard := keyboards.NextOfferKeyBoard(cp.dependencies.TextProvider)
+	nextOfferKeyboard := keyboards.GetNextOfferKeyBoard(cp.dependencies.TextProvider)
 	if err := c.Respond(&telebot.CallbackResponse{}); err != nil {
 		return err
 	}

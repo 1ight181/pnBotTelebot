@@ -6,4 +6,5 @@ type TextProvider interface {
 	GetInlineQueryTitle(string) string
 	GetInlineQueryDescription(string) string
 	GetCallbackText(string) string
+	GetEmailSubject(key string) string
 }

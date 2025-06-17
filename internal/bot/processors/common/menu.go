@@ -1,14 +1,14 @@
 package common
 
 import (
-	botifaces "pnBot/internal/bot/interfaces"
 	"pnBot/internal/bot/processors/keyboards"
 	dbifaces "pnBot/internal/db/interfaces"
+	textproviface "pnBot/internal/textprovider/interfaces"
 
 	"gopkg.in/telebot.v3"
 )
 
-func ProcessMenu(c telebot.Context, textProvider botifaces.TextProvider, dbProvider dbifaces.DataBaseProvider) error {
+func ProcessMenu(c telebot.Context, textProvider textproviface.TextProvider, dbProvider dbifaces.DataBaseProvider) error {
 	userId := c.Sender().ID
 	isSubscribed, err := IsSubscribed(userId, dbProvider)
 	if err != nil {

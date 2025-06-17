@@ -20,10 +20,8 @@ func NewCommandProcessor(dependencies *deps.ProcessorDependencies) *CommandProce
 }
 
 func (cp *CommandProcessor) ProcessCommand(c telebot.Context) error {
-	if c.Message().Via != nil {
-		if c.Message().Via.IsBot {
-			return nil
-		}
+	if via := c.Message().Via; via != nil && via.IsBot {
+		return nil
 	}
 	data := c.Message().Text
 
@@ -44,6 +42,14 @@ func (cp *CommandProcessor) ProcessCommand(c telebot.Context) error {
 	case "/menu":
 		return common.ProcessMenu(c, cp.dependencies.TextProvider, cp.dependencies.DbProvider)
 	default:
+		userId := c.Sender().ID
+		switch cp.dependencies.Fsm.Get(userId) {
+		case "bug_report":
+			return cp.ProcessSubmitBugReport(c)
+		case "feedback":
+			return cp.ProcessSubmitFeedback(c)
+		}
+
 		everyXHoursButtonText := cp.dependencies.TextProvider.GetButtonText("every_x_hours")
 		everyXHoursButtonTextPrefix := strings.Split(everyXHoursButtonText, " ")[0]
 

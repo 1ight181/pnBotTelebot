@@ -1,12 +1,12 @@
 package keyboards
 
 import (
-	ifaces "pnBot/internal/bot/interfaces"
+	textproviface "pnBot/internal/textprovider/interfaces"
 
 	"gopkg.in/telebot.v3"
 )
 
-func NextOfferKeyBoard(textProvider ifaces.TextProvider) *telebot.ReplyMarkup {
+func GetNextOfferKeyBoard(textProvider textproviface.TextProvider) *telebot.ReplyMarkup {
 	nextOfferKeyboard := &telebot.ReplyMarkup{
 		ResizeKeyboard: true,
 	}

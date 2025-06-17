@@ -5,6 +5,8 @@ type Config struct {
 	DataBase      DataBase      `mapstructure:"db"`
 	AdminPanel    AdminPanel    `mapstructure:"admin_panel"`
 	ImageUploader ImageUploader `mapstructure:"image_uploader"`
+	Notifier      Notifier      `mapstructure:"notifier"`
+	Smtp          Smtp          `mapstructure:"smtp"`
 }
 
 // Validate проверяет корректность структуры Config, делегируя валидацию полю Bot.
