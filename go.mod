@@ -8,6 +8,8 @@ require (
 	gopkg.in/telebot.v3 v3.3.8
 )
 
+require github.com/joho/godotenv v1.5.1 // indirect
+
 require (
 	github.com/andybalholm/brotli v1.1.0 // indirect
 	github.com/gofiber/template v1.8.3 // indirect

@@ -2,6 +2,7 @@ package providers
 
 import (
 	"pnBot/internal/config/models"
+	"strings"
 
 	"github.com/spf13/viper"
 )
@@ -27,6 +28,9 @@ func (v *ViperConfigProvider) Load(
 	viper.SetConfigName(filename)
 	viper.AddConfigPath(path)
 	viper.SetConfigType(configType)
+
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+	viper.AutomaticEnv()
 
 	if err := viper.ReadInConfig(); err != nil {
 		return nil, err
