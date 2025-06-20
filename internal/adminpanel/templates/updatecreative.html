@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ru">
+	<head>
+		<meta charset="UTF-8" />
+		<title>Обновить креатив</title>
+		<link rel="stylesheet" href="/static/styles.css" />
+		<script src="https://unpkg.com/htmx.org@1.9.2"></script>
+		<script>
+			document.body.addEventListener("htmx:afterRequest", function (event) {
+				const responseHTML = event.detail.xhr.responseText;
+				if (responseHTML.includes("success-box")) {
+					document.getElementById("creative-edit-form").innerHTML = "";
+				}
+			});
+		</script>
+	</head>
+	<body class="body">
+		<h1 class="title">Обновить креатив</h1>
+
+		<a href="/main" class="button button-back">← Вернуться в главное меню</a>
+
+		<label for="creative-select" class="label"
+			>Выберите креатив для редактирования:</label
+		>
+		<select
+			id="creative-select"
+			class="input"
+			hx-get="/update/creatives"
+			hx-target="#creative-edit-form"
+			hx-swap="innerHTML"
+			name="creative_id"
+		>
+			<option value="">-- Выберите креатив для редактирования --</option>
+			{{range .Creatives}}
+			<option value="{{.Id}}">{{.PartnerInternalCreativeId}}</option>
+			{{end}}
+		</select>
+
+		<div id="creative-edit-form"></div>
+	</body>
+</html>

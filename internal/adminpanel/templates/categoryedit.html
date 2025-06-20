@@ -1,0 +1,7 @@
+<form class="form" hx-post="/update/categories" hx-target="#category-edit-form" hx-swap="innerHTML">
+  <input type="hidden" name="category_id" value="{{.Category.Id}}" />
+  <label class="label" for="category-name">Название категории:</label>
+  <input class="input" id="category-name" type="text" name="name" value="{{.Category.Name}}" required />
+  <button class="button" type="submit">Обновить</button>
+</form>
+<div id="category-result">{{.Result}}</div>

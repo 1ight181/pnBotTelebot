@@ -10,6 +10,8 @@ type AdminPanel struct {
 	TemplatesExtension string `mapstructure:"templates_extension"`
 	Port               string `mapstructure:"port"`
 	Host               string `mapstructure:"host"`
+	StaticRoot         string `mapstructure:"static_root"`
+	StaticUrl          string `mapstructure:"static_url"`
 }
 
 func (ap *AdminPanel) Validate() error {
@@ -27,6 +29,12 @@ func (ap *AdminPanel) Validate() error {
 	}
 	if ap.Host == "" {
 		return errors.New("требуется указание хоста")
+	}
+	if ap.StaticRoot == "" {
+		return errors.New("требуется указание пути к статическим данным")
+	}
+	if ap.StaticUrl == "" {
+		return errors.New("требуется указание url к статическим данным")
 	}
 	return nil
 }

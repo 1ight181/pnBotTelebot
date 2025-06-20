@@ -1,0 +1,22 @@
+<form class="form" hx-post="/update/creatives" hx-target="#creative-edit-form" hx-swap="innerHTML">
+  <input type="hidden" name="id" value="{{.Creative.Id}}" />
+
+  <label class="label" for="creative-id">Внутренний ID:</label>
+  <input class="input" id="creative-id" type="text" name="partner_internal_creative_id" value="{{.Creative.PartnerInternalCreativeId}}" required />
+
+  <label class="label" for="offer-select">Оффер:</label>
+  <select class="input" id="offer-select" name="offer_id">
+    {{range .Offers}}
+    <option value="{{.Id}}" {{if eq .Id $.Creative.OfferId}}selected{{end}}>{{.Title}}</option>
+    {{end}}
+  </select>
+
+  <label class="label" for="creative-type">Тип:</label>
+  <input class="input" id="creative-type" type="text" name="type" value="{{.Creative.Type}}" />
+
+  <label class="label" for="creative-image">Изображение (файл загрузить заново):</label>
+  <input class="input" id="creative-image" type="file" name="image" accept="image/*" />
+
+  <button class="button" type="submit">Обновить</button>
+</form>
+<div id="creative-result">{{.Result}}</div>

@@ -72,7 +72,8 @@ func PartnerPost(db dbifaces.DataBaseProvider, imageUploader imguploaderifaces.I
 
 		response := fmt.Sprintf(`
 			<div class="success-box">Партнёр "%s" успешно добавлен!</div>
-			<select id="partner-select" name="partner_id" hx-swap-oob="true">
+			
+			<select class="input" id="partner-select" name="partner_id" hx-swap-oob="true">
 		`, newPartner.Name)
 
 		for _, partner := range partners {

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ru">
+	<head>
+		<meta charset="UTF-8" />
+		<title>Обновить оффер</title>
+		<link rel="stylesheet" href="/static/styles.css" />
+		<script src="https://unpkg.com/htmx.org@1.9.2"></script>
+		<script>
+			document.body.addEventListener("htmx:afterRequest", function (event) {
+				const responseHTML = event.detail.xhr.responseText;
+				if (responseHTML.includes("success-box")) {
+					document.getElementById("offer-edit-form").innerHTML = "";
+				}
+			});
+		</script>
+	</head>
+	<body class="body">
+		<h1 class="title">Обновить оффер</h1>
+
+		<a href="/main" class="button button-back">← Вернуться в главное меню</a>
+
+		<label for="offer-select" class="label"
+			>Выберите оффер для редактирования:</label
+		>
+		<select
+			id="offer-select"
+			class="input"
+			hx-get="/update/offers"
+			hx-target="#offer-edit-form"
+			hx-swap="innerHTML"
+			name="offer_id"
+		>
+			<option value="">-- Выберите оффер --</option>
+			{{range .Offers}}
+			<option value="{{.Id}}">{{.Title}}</option>
+			{{end}}
+		</select>
+
+		<div id="offer-edit-form"></div>
+	</body>
+</html>

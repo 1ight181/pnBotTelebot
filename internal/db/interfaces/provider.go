@@ -13,6 +13,12 @@ type DataBaseProvider interface {
 		where ...any,
 	) error
 
+	Count(
+		context ctx.Context,
+		source any,
+		out *int64,
+	) error
+
 	First(
 		context ctx.Context,
 		out any,

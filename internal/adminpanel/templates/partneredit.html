@@ -1,0 +1,12 @@
+<form class="form" hx-post="/update/partners" hx-target="#partner-edit-form" hx-swap="innerHTML" enctype="multipart/form-data">
+  <input type="hidden" name="id" value="{{.Partner.Id}}" />
+  
+  <label class="label" for="partner-name">Название:</label>
+  <input class="input" id="partner-name" type="text" name="name" value="{{.Partner.Name}}" required />
+
+  <label class="label" for="partner-logo">Логотип (загрузить новый файл):</label>
+  <input class="input" id="partner-logo" type="file" name="logo_file" accept="image/*" />
+
+  <button class="button" type="submit">Обновить</button>
+</form>
+<div id="partner-result">{{.Result}}</div>

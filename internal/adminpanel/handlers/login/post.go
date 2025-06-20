@@ -20,7 +20,7 @@ func LoginPost(expectedUsername string, expectedPassword string, store adminifac
 			session.Set("authenticated", true)
 			session.Save()
 
-			context.SetHeader("HX-Redirect", "/create")
+			context.SetHeader("HX-Redirect", "/main")
 			context.Status(200)
 			return nil
 		}

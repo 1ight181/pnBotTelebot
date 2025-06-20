@@ -19,7 +19,7 @@ type Context interface {
 	Type(contentType string) Context
 	SetHeader(key, value string)
 	SetCookie(name, value string, maxAge int)
-	Render(code int, name string, data map[string]any) error
+	Render(code int, name string, data any) error
 	Redirect(location string, status ...int) error
 
 	Next() error

@@ -22,6 +22,10 @@ func (fs *FiberServer) Use(path string, middleware adminifaces.HandlerFunc) {
 	})
 }
 
+func (fs *FiberServer) Static(prefix string, root string) {
+	fs.app.Static(prefix, root)
+}
+
 func (fs *FiberServer) GET(path string, handler adminifaces.HandlerFunc) {
 	fs.app.Get(path, func(c *fiber.Ctx) error {
 		fiberContext := &FiberContext{context: c}

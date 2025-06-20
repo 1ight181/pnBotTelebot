@@ -1,244 +1,112 @@
 <!DOCTYPE html>
 <html lang="ru">
-	<head>
-		<meta charset="UTF-8" />
-		<title>Администрационная панель</title>
-		<script src="https://unpkg.com/htmx.org@1.9.2"></script>
-		<script>
-			document.addEventListener("DOMContentLoaded", () => {
-				document.body.addEventListener("htmx:afterRequest", function (event) {
-					const responseHTML = event.detail.xhr.responseText;
-					if (responseHTML.includes("success-box")) {
-						event.target.closest("form")?.reset();
-					}
-				});
-			});
-		</script>
-		<style>
-			body {
-				font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-				margin: 2rem auto;
-				max-width: 700px;
-				padding: 0 1rem;
-				background: #f9f9f9;
-				color: #333;
-			}
+  <head>
+    <meta charset="UTF-8" />
+    <title>Администрационная панель</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+    <script src="https://unpkg.com/htmx.org@1.9.2"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        document.body.addEventListener("htmx:afterRequest", function (event) {
+          const responseHTML = event.detail.xhr.responseText;
+          if (responseHTML.includes("success-box")) {
+            event.target.closest("form")?.reset();
+          }
+        });
+      });
+    </script>
+  </head>
+  <body class="body">
+    <h1 class="title">Создание сущностей</h1>
 
-			h1,
-			h2 {
-				font-weight: 600;
-				margin-bottom: 1rem;
-				color: #222;
-			}
+    <a href="/main" class="button button-back">← Вернуться в главное меню</a>
 
-			form {
-				background: white;
-				padding: 1.25rem 1.5rem;
-				margin-bottom: 2rem;
-				border-radius: 8px;
-				box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
-				border: 1px solid #ddd;
-			}
+    <!-- Категория -->
+    <h2 class="subtitle">Новая категория</h2>
+    <form class="form" hx-post="/create/categories" hx-target="#category-result" hx-swap="innerHTML">
+      <label class="label" for="category-name">Название категории:</label>
+      <input class="input" id="category-name" type="text" name="name" required />
+      <button class="button" type="submit">Создать</button>
+    </form>
+    <div id="category-result"></div>
 
-			label {
-				font-weight: 600;
-				display: block;
-				margin-top: 1rem;
-				margin-bottom: 0.3rem;
-				color: #555;
-			}
+    <!-- Партнёр -->
+    <h2 class="subtitle">Новый партнёр</h2>
+    <form class="form" hx-post="/create/partners" hx-target="#partner-result" hx-swap="innerHTML" enctype="multipart/form-data">
+      <label class="label" for="partner-name">Название:</label>
+      <input class="input" id="partner-name" type="text" name="name" required />
 
-			input[type="text"],
-			input[type="number"],
-			input[type="file"],
-			select,
-			textarea {
-				width: 100%;
-				padding: 0.5rem 0.6rem;
-				font-size: 1rem;
-				border: 1px solid #ccc;
-				border-radius: 5px;
-				box-sizing: border-box;
-				transition: border-color 0.2s ease;
-			}
+      <label class="label" for="partner-logo">Логотип (загрузить файл):</label>
+      <input class="input" id="partner-logo" type="file" name="logo_file" accept="image/*" />
 
-			input[type="text"]:focus,
-			input[type="number"]:focus,
-			select:focus,
-			textarea:focus,
-			input[type="file"]:focus {
-				border-color: #007bff;
-				outline: none;
-				box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
-			}
+      <button class="button" type="submit">Создать</button>
+    </form>
+    <div id="partner-result"></div>
 
-			textarea {
-				min-height: 80px;
-				resize: vertical;
-			}
+    <!-- Оффер -->
+    <h2 class="subtitle">Новый оффер</h2>
+    <form class="form" hx-post="/create/offers" hx-target="#offer-result" hx-swap="innerHTML">
+      <label class="label" for="partner-offer-id">Внутренний ID партнёра:</label>
+      <input class="input" id="partner-offer-id" type="text" name="partner_internal_offer_id" required />
 
-			button {
-				margin-top: 1.2rem;
-				padding: 0.6rem 1.2rem;
-				font-weight: 600;
-				background-color: #007bff;
-				color: white;
-				border: none;
-				border-radius: 5px;
-				cursor: pointer;
-				transition: background-color 0.3s ease;
-			}
+      <label class="label" for="offer-title">Заголовок:</label>
+      <input class="input" id="offer-title" type="text" name="title" required />
 
-			button:hover {
-				background-color: #0056b3;
-			}
+      <label class="label" for="offer-description">Описание:</label>
+      <textarea class="input textarea" id="offer-description" name="description"></textarea>
 
-			.success-box,
-			.error-box {
-				margin-top: 10px;
-				padding: 10px 14px;
-				border-radius: 6px;
-				font-weight: 600;
-				text-align: center;
-				box-sizing: border-box;
-			}
+      <label class="label" for="offer-status">Статус:</label>
+      <select class="input" id="offer-status" name="status">
+        <option value="active">Активен</option>
+        <option value="paused">Пауза</option>
+        <option value="archived">Архив</option>
+      </select>
 
-			.success-box {
-				color: #155724;
-				background-color: #d4edda;
-				border: 1.5px solid #c3e6cb;
-			}
+      <label class="label" for="category-select">Категория:</label>
+      <select class="input" id="category-select" name="category_id">
+        {{range .Categories}}
+        <option value="{{.Id}}">{{.Name}}</option>
+        {{end}}
+      </select>
 
-			.error-box {
-				color: #721c24;
-				background-color: #f8d7da;
-				border: 1.5px solid #f5c6cb;
-			}
-		</style>
-	</head>
-	<body>
-		<h1>Администрационная панель</h1>
+      <label class="label" for="partner-select">Партнёр:</label>
+      <select class="input" id="partner-select" name="partner_id">
+        {{range .Partners}}
+        <option value="{{.Id}}">{{.Name}}</option>
+        {{end}}
+      </select>
 
-		<!-- Категория -->
-		<h2>Новая категория</h2>
-		<form
-			hx-post="/create/categories"
-			hx-target="#category-result"
-			hx-swap="innerHTML"
-		>
-			<label for="category-name">Название категории:</label>
-			<input id="category-name" type="text" name="name" required />
-			<button type="submit">Создать</button>
-		</form>
-		<div id="category-result"></div>
+      <label class="label" for="tracking-link">Трэк-ссылка:</label>
+      <input class="input" id="tracking-link" type="text" name="tracking_link" />
 
-		<!-- Партнёр -->
-		<h2>Новый партнёр</h2>
-		<form
-			hx-post="/create/partners"
-			hx-target="#partner-result"
-			hx-swap="innerHTML"
-			enctype="multipart/form-data"
-		>
-			<label for="partner-name">Название:</label>
-			<input id="partner-name" type="text" name="name" required />
+      <label class="label" for="payout">Процент:</label>
+      <input class="input" id="payout" type="number" step="0.01" name="payout" />
 
-			<label for="partner-logo">Логотип (загрузить файл):</label>
-			<input id="partner-logo" type="file" name="logo_file" accept="image/*" />
+      <button class="button" type="submit">Создать</button>
+    </form>
+    <div id="offer-result"></div>
 
-			<button type="submit">Создать</button>
-		</form>
-		<div id="partner-result"></div>
+    <!-- Креатив -->
+    <h2 class="subtitle">Новый креатив</h2>
+    <form class="form" hx-post="/create/creatives" hx-target="#creative-result" hx-swap="innerHTML" enctype="multipart/form-data">
+      <label class="label" for="creative-id">Внутренний ID:</label>
+      <input class="input" id="creative-id" type="text" name="partner_internal_creative_id" required />
 
-		<!-- Оффер -->
-		<h2>Новый оффер</h2>
-		<form
-			hx-post="/create/offers"
-			hx-target="#offer-result"
-			hx-swap="innerHTML"
-		>
-			<label for="partner-offer-id">Внутренний ID партнёра:</label>
-			<input
-				id="partner-offer-id"
-				type="text"
-				name="partner_internal_offer_id"
-				required
-			/>
+      <label class="label" for="offer-select">Оффер:</label>
+      <select class="input" id="offer-select" name="offer_id">
+        {{range .Offers}}
+        <option value="{{.Id}}">{{.Title}}</option>
+        {{end}}
+      </select>
 
-			<label for="offer-title">Заголовок:</label>
-			<input id="offer-title" type="text" name="title" required />
+      <label class="label" for="creative-type">Тип:</label>
+      <input class="input" id="creative-type" type="text" name="type" />
 
-			<label for="offer-description">Описание:</label>
-			<textarea id="offer-description" name="description"></textarea>
+      <label class="label" for="creative-image">Изображение (загрузить файл):</label>
+      <input class="input" id="creative-image" type="file" name="image" accept="image/*" required />
 
-			<label for="offer-status">Статус:</label>
-			<select id="offer-status" name="status">
-				<option value="active">Активен</option>
-				<option value="paused">Пауза</option>
-				<option value="archived">Архив</option>
-			</select>
-
-			<label for="category-select">Категория:</label>
-			<select id="category-select" name="category_id">
-				{{range .Categories}}
-				<option value="{{.Id}}">{{.Name}}</option>
-				{{end}}
-			</select>
-
-			<label for="partner-select">Партнёр:</label>
-			<select id="partner-select" name="partner_id">
-				{{range .Partners}}
-				<option value="{{.Id}}">{{.Name}}</option>
-				{{end}}
-			</select>
-
-			<label for="tracking-link">Трэк-ссылка:</label>
-			<input id="tracking-link" type="text" name="tracking_link" />
-
-			<label for="payout">Процент:</label>
-			<input id="payout" type="number" step="0.01" name="payout" />
-
-			<button type="submit">Создать</button>
-		</form>
-		<div id="offer-result"></div>
-
-		<!-- Креатив -->
-		<h2>Новый креатив</h2>
-		<form
-			hx-post="/create/creatives"
-			hx-target="#creative-result"
-			hx-swap="innerHTML"
-			enctype="multipart/form-data"
-		>
-			<label for="creative-id">Внутренний ID:</label>
-			<input
-				id="creative-id"
-				type="text"
-				name="partner_internal_creative_id"
-				required
-			/>
-
-			<label for="offer-select">Оффер:</label>
-			<select id="offer-select" name="offer_id">
-				{{range .Offers}}
-				<option value="{{.Id}}">{{.Title}}</option>
-				{{end}}
-			</select>
-
-			<label for="creative-type">Тип:</label>
-			<input id="creative-type" type="text" name="type" />
-
-			<label for="creative-image">Изображение (загрузить файл):</label>
-			<input
-				id="creative-image"
-				type="file"
-				name="image"
-				accept="image/*"
-				required
-			/>
-
-			<button type="submit">Создать</button>
-		</form>
-		<div id="creative-result"></div>
-	</body>
+      <button class="button" type="submit">Создать</button>
+    </form>
+    <div id="creative-result"></div>
+  </body>
 </html>

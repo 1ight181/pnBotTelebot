@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Обновить партнёра</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+    <script src="https://unpkg.com/htmx.org@1.9.2"></script>
+    <script>
+        document.body.addEventListener("htmx:afterRequest", function (event) {
+          const responseHTML = event.detail.xhr.responseText;
+          if (responseHTML.includes("success-box")) {
+            document.getElementById('partner-edit-form').innerHTML = '';
+          }
+        });
+    </script>
+  </head>
+  <body class="body">
+    <h1 class="title">Обновить партнёра</h1>
+
+    <a href="/main" class="button button-back">← Вернуться в главное меню</a>
+
+    <label for="partner-select" class="label">Выберите партнёра для редактирования:</label>
+    <select id="partner-select" class="input" hx-get="/update/partners"
+			hx-target="#partner-edit-form"
+			hx-swap="innerHTML"
+			name="partner_id">
+      <option value="">-- Выберите партнёра --</option>
+      {{range .Partners}}
+      <option value="{{.Id}}">{{.Name}}</option>
+      {{end}}
+    </select>
+
+    <div id="partner-edit-form"></div>
+  </body>
+</html>

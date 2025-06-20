@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ru">
+	<head>
+		<meta charset="UTF-8" />
+		<title>Удаление элементов</title>
+		<link rel="stylesheet" href="/static/styles.css" />
+		<script src="https://unpkg.com/htmx.org@1.9.2"></script>
+	</head>
+	<body class="body">
+		<h1 class="title">Удаление данных</h1>
+
+        <a href="/main" class="button button-back">← Вернуться в главное меню</a>
+
+		<!-- Категории -->
+		<h2 class="subtitle">Удалить категорию</h2>
+		<form
+			class="form"
+			hx-post="/delete/category"
+			hx-target="#category-delete-result"
+			hx-swap="innerHTML"
+		>
+			<label class="label" for="category-select">Выберите категорию:</label>
+			<select class="input" id="category-select" name="category_id" required>
+				<option value="">-- Выберите категорию --</option>
+				{{range .Categories}}
+				<option value="{{.Id}}">{{.Name}}</option>
+				{{end}}
+			</select>
+			<button class="button button-danger button-full" type="submit">
+				Удалить категорию
+			</button>
+		</form>
+		<div id="category-delete-result"></div>
+
+		<!-- Партнёры -->
+		<h2 class="subtitle">Удалить партнёра</h2>
+		<form
+			class="form"
+			hx-post="/delete/partner"
+			hx-target="#partner-delete-result"
+			hx-swap="innerHTML"
+		>
+			<label class="label" for="partner-select">Выберите партнёра:</label>
+			<select class="input" id="partner-select" name="partner_id" required>
+				<option value="">-- Выберите партнера --</option>
+				{{range .Partners}}
+				<option value="{{.Id}}">{{.Name}}</option>
+				{{end}}
+			</select>
+			<button class="button button-danger button-full" type="submit">
+				Удалить партнёра
+			</button>
+		</form>
+		<div id="partner-delete-result"></div>
+
+		<!-- Офферы -->
+		<h2 class="subtitle">Удалить оффер</h2>
+		<form
+			class="form"
+			hx-post="/delete/offer"
+			hx-target="#offer-delete-result"
+			hx-swap="innerHTML"
+		>
+			<label class="label" for="offer-select">Выберите оффер:</label>
+			<select class="input" id="offer-select" name="offer_id" required>
+				<option value="">-- Выберите оффер --</option>
+				{{range .Offers}}
+				<option value="{{.Id}}">{{.Title}}</option>
+				{{end}}
+			</select>
+			<button class="button button-danger button-full" type="submit">
+				Удалить оффер
+			</button>
+		</form>
+		<div id="offer-delete-result"></div>
+
+		<!-- Креативы -->
+		<h2 class="subtitle">Удалить креатив</h2>
+		<form
+			class="form"
+			hx-post="/delete/creative"
+			hx-target="#creative-delete-result"
+			hx-swap="innerHTML"
+		>
+			<label class="label" for="creative-select">Выберите креатив:</label>
+			<select class="input" id="creative-select" name="creative_id" required>
+				<option value="">-- Выберите креатив --</option>
+				{{range .Creatives}}
+				<option value="{{.Id}}">{{.PartnerInternalCreativeId}}</option>
+				{{end}}
+			</select>
+			<button class="button button-danger button-full" type="submit">
+				Удалить креатив
+			</button>
+		</form>
+		<div id="creative-delete-result"></div>
+	</body>
+</html>

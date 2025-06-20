@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ru">
+	<head>
+		<meta charset="UTF-8" />
+		<title>Админ-панель</title>
+		<link rel="stylesheet" href="/static/styles.css" />
+	</head>
+	<body class="body">
+		<h1 class="title">Админ-панель</h1>
+		<div class="form">
+
+			<a href="/create" class="button button-full">Создание сущностей</a>
+
+			<a
+				href="/delete"
+				class="button button-full button-danger {{if not (or .HasCategories .HasPartners .HasOffers .HasCreatives)}}disabled-button{{end}}"
+			>
+				Удаление сущностей
+			</a>
+
+			<label class="label label-margin-top">Редактирование:</label>
+			<a
+				href="/update/categories"
+				class="nav-link {{if not .HasCategories}}disabled-link{{end}}"
+				>Редактировать категории</a
+			>
+			<a
+				href="/update/partners"
+				class="nav-link {{if not .HasPartners}}disabled-link{{end}}"
+				>Редактировать партнёров</a
+			>
+			<a
+				href="/update/offers"
+				class="nav-link {{if not .HasOffers}}disabled-link{{end}}"
+				>Редактировать офферы</a
+			>
+			<a
+				href="/update/creatives"
+				class="nav-link {{if not .HasCreatives}}disabled-link{{end}}"
+				>Редактировать креативы</a
+			>
+
+             <a class="button button-full button-logout" href="/logout">Выйти из системы</a>
+	
+		</div>
+	</body>
+</html>

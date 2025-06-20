@@ -30,7 +30,7 @@ func CategoryPost(db dbifaces.DataBaseProvider) adminifaces.HandlerFunc {
 		response := fmt.Sprintf(`
 			<div class="success-box">Категория "%s" успешно добавлена!</div>
 
-			<select id="category-select" name="category_id" hx-swap-oob="true">
+			<select class="input" id="category-select" name="category_id" hx-swap-oob="true">
 		`, newCategory.Name)
 
 		for _, category := range categories {

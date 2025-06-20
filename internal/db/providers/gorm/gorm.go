@@ -129,6 +129,14 @@ func (gdbp *GormDataBaseProvider) Update(
 		Error
 }
 
+func (gdbp *GormDataBaseProvider) Count(
+	context ctx.Context,
+	source any,
+	out *int64,
+) error {
+	return gdbp.dataBase.Model(source).Count(out).Error
+}
+
 func (gdbp *GormDataBaseProvider) Updates(
 	context ctx.Context,
 	where any,

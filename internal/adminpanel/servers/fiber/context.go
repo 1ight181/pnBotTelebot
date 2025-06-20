@@ -77,7 +77,7 @@ func (fc *FiberContext) SetCookie(name, value string, maxAge int) {
 	})
 }
 
-func (fc *FiberContext) Render(code int, name string, data map[string]any) error {
+func (fc *FiberContext) Render(code int, name string, data any) error {
 	return fc.context.Status(code).Render(name, data)
 }
 

@@ -62,7 +62,7 @@ func OfferPost(db dbifaces.DataBaseProvider) adminifaces.HandlerFunc {
 		response := fmt.Sprintf(`
 			<div class="success-box"> Оффер "%s" успешно добавлен! </div>
 
-			<select id="offer-select" name="offer_id" hx-swap-oob="true">
+			<select class="input" id="offer-select" name="offer_id" hx-swap-oob="true">
 		`, newOffer.Title)
 
 		for _, offer := range offers {

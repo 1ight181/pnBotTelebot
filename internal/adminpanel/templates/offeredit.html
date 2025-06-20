@@ -1,0 +1,42 @@
+<form class="form" hx-post="/update/offers" hx-target="#offer-edit-form" hx-swap="innerHTML">
+  <input type="hidden" name="id" value="{{.Offer.Id}}" />
+
+  <label class="label" for="partner-offer-id">Внутренний ID партнёра:</label>
+  <input class="input" id="partner-offer-id" type="text" name="partner_internal_offer_id" value="{{.Offer.PartnerInternalOfferId}}" required />
+
+  <label class="label" for="offer-title">Заголовок:</label>
+  <input class="input" id="offer-title" type="text" name="title" value="{{.Offer.Title}}" required />
+
+  <label class="label" for="offer-description">Описание:</label>
+  <textarea class="input textarea" id="offer-description" name="description">{{.Offer.Description}}</textarea>
+
+  <label class="label" for="offer-status">Статус:</label>
+  <select class="input" id="offer-status" name="status">
+    <option value="active" {{if eq .Offer.Status "active"}}selected{{end}}>Активен</option>
+    <option value="paused" {{if eq .Offer.Status "paused"}}selected{{end}}>Пауза</option>
+    <option value="archived" {{if eq .Offer.Status "archived"}}selected{{end}}>Архив</option>
+  </select>
+
+  <label class="label" for="category-select">Категория:</label>
+  <select class="input" id="category-select" name="category_id">
+    {{range .Categories}}
+    <option value="{{.Id}}" {{if eq .Id $.Offer.CategoryId}}selected{{end}}>{{.Name}}</option>
+    {{end}}
+  </select>
+
+  <label class="label" for="partner-select">Партнёр:</label>
+  <select class="input" id="partner-select" name="partner_id">
+    {{range .Partners}}
+    <option value="{{.Id}}" {{if eq .Id $.Offer.PartnerId}}selected{{end}}>{{.Name}}</option>
+    {{end}}
+  </select>
+
+  <label class="label" for="tracking-link">Трэк-ссылка:</label>
+  <input class="input" id="tracking-link" type="text" name="tracking_link" value="{{.Offer.TrackingLink}}" />
+
+  <label class="label" for="payout">Процент:</label>
+  <input class="input" id="payout" type="number" step="0.01" name="payout" value="{{.Offer.Payout}}" />
+
+  <button class="button" type="submit">Обновить</button>
+</form>
+<div id="offer-result">{{.Result}}</div>
