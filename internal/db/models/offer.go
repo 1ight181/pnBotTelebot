@@ -1,7 +1,7 @@
 package models
 
 import (
-	enums "pnBot/internal/db/enums"
+	"pnBot/internal/db/enums"
 	"time"
 )
 
@@ -18,7 +18,7 @@ type Offer struct {
 	UpdatedAt              time.Time `gorm:"autoUpdateTime"`
 	Payout                 float64
 
-	Category  Category
-	Partner   Partner
-	Creatives []Creative
+	Category  Category   `gorm:"foreignKey:CategoryId;references:Id"`
+	Partner   Partner    `gorm:"foreignKey:PartnerId;references:Id"`
+	Creatives []Creative `gorm:"foreignKey:OfferId"`
 }

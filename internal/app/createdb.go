@@ -23,7 +23,7 @@ func createDataBase(
 	dbConfig models.DataBase,
 	logger loggerifaces.Logger,
 ) (
-	dbifaces.DataBaseProvider, dbifaces.OfferDao,
+	dbifaces.DataBaseProvider, dbifaces.OfferDao, dbifaces.UserDao,
 ) {
 	dsn, migrationsPath := loaders.LoadDbConfig(dbConfig)
 
@@ -54,6 +54,8 @@ func createDataBase(
 
 	offerDao := dbdao.NewOfferDao(gormDB)
 
+	userDao := dbdao.NewUserDao(gormDB)
+
 	migrationManager, err := migrationmanager.New(
 		migrationsPath,
 		dsn,
@@ -79,5 +81,5 @@ func createDataBase(
 		}
 	}()
 
-	return dbProvider, offerDao
+	return dbProvider, offerDao, userDao
 }

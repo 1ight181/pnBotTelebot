@@ -13,6 +13,8 @@ type User struct {
 	IsSubscribed          bool
 	NotificationFrequency int `gorm:"default:4"`
 
-	PreferredCategories []Category `gorm:"many2many:user_categories;"`
-	StatisticsLogs      []StatisticsLog
+	PreferredCategories []Category      `gorm:"many2many:user_categories;"`
+	StatisticsLogs      []StatisticsLog `gorm:"foreignKey:UserId"`
+	BannedUser          *BannedUser     `gorm:"foreignKey:UserId"`
+	SendingsLogs        []SendingsLog   `gorm:"foreignKey:UserId"`
 }

@@ -9,6 +9,6 @@ type StatisticsLog struct {
 	ClickedAt time.Time
 	IpAddress string
 
-	User  User
-	Offer Offer
+	User  User  `gorm:"foreignKey:UserId;references:Id"`
+	Offer Offer `gorm:"foreignKey:OfferId;references:Id"`
 }

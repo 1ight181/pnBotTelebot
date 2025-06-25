@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	templates "pnBot/internal/adminpanel/templates"
+	banifaces "pnBot/internal/banmanager/interfaces"
 	loaders "pnBot/internal/config/loaders"
 	dbifaces "pnBot/internal/db/interfaces"
 	uploaders "pnBot/internal/imageuploader/uploaders"
@@ -16,6 +17,12 @@ import (
 
 	//Хэндлер главного меню
 	main "pnBot/internal/adminpanel/handlers/main"
+
+	//Хэндлер панели управления пользователями
+	users "pnBot/internal/adminpanel/handlers/users"
+	banusers "pnBot/internal/adminpanel/handlers/users/ban"
+	deleteuser "pnBot/internal/adminpanel/handlers/users/delete"
+	unbanusers "pnBot/internal/adminpanel/handlers/users/unban"
 
 	//Хэндлеры для удаления
 	delete "pnBot/internal/adminpanel/handlers/delete"
@@ -55,6 +62,8 @@ func startAdminPanel(
 	imageUploaderConfig models.ImageUploader,
 	db dbifaces.DataBaseProvider,
 	logger loggerifaces.Logger,
+	userDao dbifaces.UserDao,
+	banManager banifaces.BanManager,
 ) {
 	expectedUsername, expectedPassword, templatesExtension, host, port, staticRoot, staticUrl := loaders.LoadAdminPanelConfig(adminPanelConfig)
 	freeimagehostApi := loaders.LoadImageUploaderConfig(imageUploaderConfig)
@@ -80,6 +89,11 @@ func startAdminPanel(
 	)
 
 	fiberServer.Use(
+		"/users",
+		middleware.AuthMiddleware(fiberStore),
+	)
+
+	fiberServer.Use(
 		"/update",
 		middleware.AuthMiddleware(fiberStore),
 	)
@@ -99,6 +113,26 @@ func startAdminPanel(
 	fiberServer.GET(
 		"/main",
 		main.MainGet(db),
+	)
+
+	fiberServer.GET(
+		"/users",
+		users.UsersGet(userDao, banManager),
+	)
+
+	fiberServer.POST(
+		"/users/delete",
+		deleteuser.DeleteUserPost(userDao, banManager),
+	)
+
+	fiberServer.POST(
+		"/users/ban",
+		banusers.BanUserPost(banManager, userDao),
+	)
+
+	fiberServer.POST(
+		"/users/unban",
+		unbanusers.UnbanUserPost(banManager, userDao),
 	)
 
 	fiberServer.GET(

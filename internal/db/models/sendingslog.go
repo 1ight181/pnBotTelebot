@@ -8,6 +8,6 @@ type SendingsLog struct {
 	OfferId   uint      `gorm:"index"`
 	CreatedAt time.Time `gorm:"autoCreateTime"`
 
-	User  User
-	Offer Offer
+	User  User  `gorm:"foreignKey:UserId;references:Id"`
+	Offer Offer `gorm:"foreignKey:OfferId;references:Id"`
 }

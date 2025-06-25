@@ -67,16 +67,16 @@ func Run() {
 		baseLogger.Fatalf("Ошибка загрузки конфигурации: %v", err)
 	}
 
-	dbProvider, offerDao := createDataBase(context, config.DataBase, dbLogger)
+	dbProvider, offerDao, userDao := createDataBase(context, config.DataBase, dbLogger)
 
 	redisClient := createRedisClient(context, &config.Cache, redisClientLogger)
 
-	banManager := banmanager.NewBanManager(context, dbProvider)
+	banManager := banmanager.NewBanManager(context, dbProvider, redisClient)
 	spamManager := createSpamManager(context, &config.SpamManager, banManager, redisClient)
 
 	startBot(context, &config.Bot, &config.Notifier, &config.Smtp, botLogger, dbProvider, offerDao, spamManager)
 
-	startAdminPanel(context, config.AdminPanel, config.ImageUploader, dbProvider, adminPanelLogger)
+	startAdminPanel(context, config.AdminPanel, config.ImageUploader, dbProvider, adminPanelLogger, userDao, banManager)
 
 	<-stopSignal
 	baseLogger.Info("Получен сигнал завершения, остановка...")

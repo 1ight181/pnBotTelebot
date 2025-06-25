@@ -1,0 +1,11 @@
+{{ range .Users }}
+<div class="user-record">
+	<label>
+		<input type="checkbox" name="user_ids" value="{{ .Id }}" class="user-checkbox" />
+		<b>{{ .Fullname }}</b> @{{ .Username }}
+		{{ if .IsBanned }}
+		<span class="tag tag-danger">Забанен: {{ .BanReason }}</span>
+		{{ end }}
+	</label>
+</div>
+{{ end }}

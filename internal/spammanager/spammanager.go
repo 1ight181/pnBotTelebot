@@ -90,9 +90,6 @@ func (sm *SpamManager) IsAllowed(userId int64) (banned bool, warned bool, remain
 			if err := sm.banManager.Ban(userId, sm.banReasonText, sm.banDuration, sm.banAuthor); err != nil {
 				return false, false, 0, err
 			}
-			if err := sm.cacheProvider.Set(isBannedKey, "true", sm.banDuration); err != nil {
-				return false, false, 0, err
-			}
 		}
 		return true, true, 0, nil
 	}

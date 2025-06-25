@@ -65,6 +65,15 @@ func (fc *FiberContext) FormValue(name string) string {
 	return fc.context.FormValue(name)
 }
 
+func (fc *FiberContext) FormValues(name string) []string {
+	values := fc.context.Request().PostArgs().PeekMulti(name)
+	result := make([]string, len(values))
+	for i, v := range values {
+		result[i] = string(v)
+	}
+	return result
+}
+
 func (fc *FiberContext) SetHeader(key, value string) {
 	fc.context.Set(key, value)
 }

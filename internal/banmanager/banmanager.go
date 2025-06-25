@@ -2,24 +2,30 @@ package banmanager
 
 import (
 	ctx "context"
+	"fmt"
+	cacheifaces "pnBot/internal/cache/interfaces"
 	dbifaces "pnBot/internal/db/interfaces"
 	dbmodels "pnBot/internal/db/models"
 	"time"
 )
 
 type BanManager struct {
-	dbProvider dbifaces.DataBaseProvider
-	context    ctx.Context
+	dbProvider    dbifaces.DataBaseProvider
+	context       ctx.Context
+	cacheProvider cacheifaces.CacheProvider
 }
 
-func NewBanManager(context ctx.Context, dbProvider dbifaces.DataBaseProvider) *BanManager {
+func NewBanManager(context ctx.Context, dbProvider dbifaces.DataBaseProvider, cacheProvider cacheifaces.CacheProvider) *BanManager {
 	return &BanManager{
-		dbProvider: dbProvider,
-		context:    context,
+		dbProvider:    dbProvider,
+		context:       context,
+		cacheProvider: cacheProvider,
 	}
 }
 
 func (bm *BanManager) Ban(userId int64, reason string, duration time.Duration, author string) error {
+	isBannedKey := fmt.Sprintf("user:ban:%d", userId)
+
 	var user dbmodels.User
 	err := bm.dbProvider.First(bm.context, &user, "tg_id = ?", userId)
 	if err != nil {
@@ -36,10 +42,14 @@ func (bm *BanManager) Ban(userId int64, reason string, duration time.Duration, a
 
 	exp := time.Now().Add(duration)
 	ban := &dbmodels.BannedUser{
-		UserID:    user.Id,
+		UserId:    user.Id,
 		Reason:    reason,
 		ExpiresAt: &exp,
 		CreatedBy: author,
+	}
+
+	if err := bm.cacheProvider.Set(isBannedKey, "true", duration); err != nil {
+		return err
 	}
 
 	return bm.dbProvider.Create(bm.context, ban)
@@ -63,14 +73,34 @@ func (bm *BanManager) IsBanned(userId int64) (bool, error) {
 }
 
 func (bm *BanManager) Unban(userId int64) error {
+	isBannedKey := fmt.Sprintf("user:ban:%d", userId)
+	warnCountKey := fmt.Sprintf("user:warncount:%d", userId)
+	messageCountKey := fmt.Sprintf("user:msgcount:%d", userId)
+
 	var user dbmodels.User
 	if err := bm.dbProvider.First(bm.context, &user, "tg_id = ?", userId); err != nil {
 		return err
 	}
 
 	where := dbmodels.BannedUser{
-		UserID: user.Id,
+		UserId: user.Id,
 	}
-	expiredTime := time.Now().Add(-time.Second)
-	return bm.dbProvider.Update(bm.context, where, "expires_at", &expiredTime)
+
+	if err := bm.cacheProvider.Del(isBannedKey); err != nil {
+		return err
+	}
+
+	if err := bm.cacheProvider.Del(warnCountKey); err != nil {
+		return err
+	}
+
+	if err := bm.cacheProvider.Del(messageCountKey); err != nil {
+		return err
+	}
+
+	return bm.dbProvider.Delete(
+		bm.context,
+		&dbmodels.BannedUser{},
+		where,
+	)
 }

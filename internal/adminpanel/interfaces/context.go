@@ -11,6 +11,7 @@ type Context interface {
 	BodyParser(out interface{}) error
 	Cookie(name string) string
 	FormValue(name string) string
+	FormValues(name string) []string
 	FormFile(name string) (*multipart.FileHeader, error)
 
 	JSON(code int, data interface{}) error

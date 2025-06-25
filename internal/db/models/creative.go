@@ -13,5 +13,5 @@ type Creative struct {
 	CreatedAt                 time.Time `gorm:"autoCreateTime"`
 	UpdatedAt                 time.Time `gorm:"autoUpdateTime"`
 
-	Offer Offer
+	Offer Offer `gorm:"foreignKey:OfferId;references:Id"`
 }

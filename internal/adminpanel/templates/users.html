@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ru">
+	<head>
+		<meta charset="UTF-8" />
+		<title>Управление пользователями</title>
+		<link rel="stylesheet" href="/static/styles.css" />
+		<script src="https://unpkg.com/htmx.org@1.9.2"></script>
+	</head>
+	<body class="body">
+		<h1 class="title">Пользователи</h1>
+		<a href="/main" class="button button-back">← Назад в меню</a>
+
+		<input
+			class="input"
+			type="text"
+			id="user-search"
+			name="search"
+			placeholder="Поиск по имени или @username"
+			hx-get="/users"
+			hx-trigger="input changed delay:300ms"
+			hx-target="#users-container"
+			hx-include="[name='search']"
+			autocomplete="off"
+		/>
+
+		<div
+			id="users-container"
+			class="form"
+			style="max-height: 400px; overflow-y: auto"
+			hx-get="/users"
+			hx-trigger="load"
+			hx-swap="innerHTML"
+		>
+			{{ template "userrecord" . }}
+		</div>
+
+		<div class="form">
+			<button
+				class="button button-danger"
+				hx-post="/users/delete"
+				hx-include=".user-checkbox:checked"
+				hx-target="#users-container"
+				hx-swap="innerHTML"
+			>
+				Удалить
+			</button>
+			<button
+				class="button button-secondary"
+				hx-post="/users/ban"
+				hx-include=".user-checkbox:checked"
+				hx-target="#users-container"
+				hx-swap="innerHTML"
+			>
+				Забанить
+			</button>
+			<button
+				class="button"
+				hx-post="/users/unban"
+				hx-include=".user-checkbox:checked"
+				hx-target="#users-container"
+				hx-swap="innerHTML"
+			>
+				Разбанить
+			</button>
+		</div>
+
+		<div id="user-action-feedback"></div>
+	</body>
+</html>

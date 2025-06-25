@@ -7,6 +7,7 @@ import (
 	models "pnBot/internal/config/models"
 	confprov "pnBot/internal/config/providers/interfaces"
 
+	"github.com/joho/godotenv"
 	"github.com/spf13/viper"
 )
 
@@ -23,6 +24,11 @@ func loadAppConfig(opts AppConfigOptions) (*models.Config, error) {
 	if path == "" {
 		path = opts.DefaultPath
 		log.Printf("Переменная окружения %s не задана, используется путь: %s", opts.EnvVar, path)
+	}
+
+	err := godotenv.Load(path + "/.env")
+	if err != nil {
+		log.Fatalf("Ошибка загрузки .env файла")
 	}
 
 	config, err := opts.Provider.Load(
