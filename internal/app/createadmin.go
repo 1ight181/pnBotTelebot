@@ -49,12 +49,12 @@ import (
 	"github.com/gofiber/template/html/v2"
 )
 
-func StartAdminPanel(
+func startAdminPanel(
+	context context.Context,
 	adminPanelConfig models.AdminPanel,
 	imageUploaderConfig models.ImageUploader,
 	db dbifaces.DataBaseProvider,
 	logger loggerifaces.Logger,
-	context context.Context,
 ) {
 	expectedUsername, expectedPassword, templatesExtension, host, port, staticRoot, staticUrl := loaders.LoadAdminPanelConfig(adminPanelConfig)
 	freeimagehostApi := loaders.LoadImageUploaderConfig(imageUploaderConfig)

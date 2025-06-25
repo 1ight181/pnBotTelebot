@@ -2,13 +2,16 @@ package middleware
 
 import (
 	ctx "context"
+	"fmt"
 	"pnBot/internal/logger/contextkeys"
 	loggerifaces "pnBot/internal/logger/interfaces"
+	spamifaces "pnBot/internal/spammanager/interfaces"
+	textprovifaces "pnBot/internal/textprovider/interfaces"
 
 	"gopkg.in/telebot.v3"
 )
 
-func LogMiddleware(logger loggerifaces.Logger) telebot.MiddlewareFunc {
+func SpamMiddleware(logger loggerifaces.Logger, spamManager spamifaces.SpamManager, textPovider textprovifaces.TextProvider) telebot.MiddlewareFunc {
 	return func(nextFunc telebot.HandlerFunc) telebot.HandlerFunc {
 		return func(c telebot.Context) error {
 			context := ctx.Background()
@@ -30,7 +33,20 @@ func LogMiddleware(logger loggerifaces.Logger) telebot.MiddlewareFunc {
 			}
 
 			contextLogger := logger.WithContext(context)
-			contextLogger.Infof("Получен update")
+
+			isBanned, warned, remaining, err := spamManager.IsAllowed(c.Sender().ID)
+			if err != nil {
+				contextLogger.Warnf("Ошибка при проверке на спам: %v", err)
+				return nil
+			}
+
+			if isBanned {
+				return c.Send(textPovider.GetText("ban"))
+			}
+
+			if warned {
+				return c.Send(fmt.Sprintf(textPovider.GetText("warn"), remaining))
+			}
 
 			return nextFunc(c)
 		}

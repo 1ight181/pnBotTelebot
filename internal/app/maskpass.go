@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-func MaskPasswordInDSN(dsn string) string {
+func maskPasswordInDSN(dsn string) string {
 	url, err := u.Parse(dsn)
 	if err != nil {
 		return dsn

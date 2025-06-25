@@ -7,6 +7,8 @@ type Config struct {
 	ImageUploader ImageUploader `mapstructure:"image_uploader"`
 	Notifier      Notifier      `mapstructure:"notifier"`
 	Smtp          Smtp          `mapstructure:"smtp"`
+	Cache         Cache         `mapstructure:"cache"`
+	SpamManager   SpamManager   `mapstructure:"spam_manager"`
 }
 
 // Validate проверяет корректность структуры Config, делегируя валидацию полю Bot.

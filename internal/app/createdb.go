@@ -18,7 +18,13 @@ import (
 	loggerifaces "pnBot/internal/logger/interfaces"
 )
 
-func CreateDataBase(dbConfig models.DataBase, logger loggerifaces.Logger, context context.Context) (dbifaces.DataBaseProvider, dbifaces.OfferDao) {
+func createDataBase(
+	context context.Context,
+	dbConfig models.DataBase,
+	logger loggerifaces.Logger,
+) (
+	dbifaces.DataBaseProvider, dbifaces.OfferDao,
+) {
 	dsn, migrationsPath := loaders.LoadDbConfig(dbConfig)
 
 	gormDB, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
@@ -60,7 +66,7 @@ func CreateDataBase(dbConfig models.DataBase, logger loggerifaces.Logger, contex
 		logger.Fatalf("Ошибка при миграции: %v", err)
 	}
 
-	maskedDsn := MaskPasswordInDSN(dsn)
+	maskedDsn := maskPasswordInDSN(dsn)
 
 	logger.Infof("БД подключена по DSN: %s", maskedDsn)
 

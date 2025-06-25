@@ -9,17 +9,6 @@ import (
 
 type ViperConfigProvider struct{}
 
-// Load загружает файл конфигурации с использованием библиотеки Viper и преобразует его содержимое
-// в структуру Config. Также выполняется проверка загруженной конфигурации.
-//
-// Параметры:
-//   - path: Путь к директории, где находится файл конфигурации.
-//   - filename: Имя файла конфигурации (без расширения).
-//   - configType: Тип файла конфигурации (например, "json", "yaml").
-//
-// Возвращает:
-//   - *models.Config: Указатель на загруженную и проверенную структуру конфигурации.
-//   - error: Ошибка, если файл конфигурации не может быть прочитан, преобразован или проверен.
 func (v *ViperConfigProvider) Load(
 	path,
 	filename,
@@ -38,6 +27,10 @@ func (v *ViperConfigProvider) Load(
 
 	config := &models.Config{}
 	if err := viper.Unmarshal(config); err != nil {
+		return nil, err
+	}
+
+	if err := resolveSecrets(config); err != nil {
 		return nil, err
 	}
 

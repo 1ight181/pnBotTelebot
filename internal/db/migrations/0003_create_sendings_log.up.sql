@@ -1,4 +1,3 @@
-
 CREATE TABLE IF NOT EXISTS sendings_logs (
     id SERIAL PRIMARY KEY,
     user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,

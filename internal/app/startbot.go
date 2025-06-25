@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	cs "pnBot/internal/scheduler/schedulers/cron"
+	cs "pnBot/internal/scheduler/cron"
 
 	c "github.com/robfig/cron/v3"
 	"gopkg.in/telebot.v3"
@@ -28,9 +28,20 @@ import (
 
 	dbifaces "pnBot/internal/db/interfaces"
 	loggerifaces "pnBot/internal/logger/interfaces"
+
+	spamifaces "pnBot/internal/spammanager/interfaces"
 )
 
-func StartBot(botConfig *models.Bot, notifierConfig *models.Notifier, smtpConfig *models.Smtp, logger loggerifaces.Logger, dbProvider dbifaces.DataBaseProvider, offerDao dbifaces.OfferDao, context ctx.Context) {
+func startBot(
+	context ctx.Context,
+	botConfig *models.Bot,
+	notifierConfig *models.Notifier,
+	smtpConfig *models.Smtp,
+	logger loggerifaces.Logger,
+	dbProvider dbifaces.DataBaseProvider,
+	offerDao dbifaces.OfferDao,
+	spamManager spamifaces.SpamManager,
+) {
 	token, isDebug, port, host, webhookUrl := loaders.LoadBotConfig(*botConfig)
 
 	address := fmt.Sprintf("%s:%s", host, port)
@@ -50,7 +61,7 @@ func StartBot(botConfig *models.Bot, notifierConfig *models.Notifier, smtpConfig
 		}
 	}
 
-	textProvider := CreateTextProvider()
+	textProvider := createTextProvider()
 
 	errorhandler := errorhandler.NewErrorHandler(
 		logger,
@@ -153,6 +164,7 @@ func StartBot(botConfig *models.Bot, notifierConfig *models.Notifier, smtpConfig
 	middlewares := []telebot.MiddlewareFunc{
 		middleware.LogMiddleware(logger),
 		errorhandler.ErrorMiddleware(),
+		middleware.SpamMiddleware(logger, spamManager, textProvider),
 	}
 
 	botOptions := tb.TelegramBotOptions{

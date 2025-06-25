@@ -4,6 +4,7 @@ import (
 	ctx "context"
 	"os"
 	"os/signal"
+	"pnBot/internal/banmanager"
 	viperprov "pnBot/internal/config/providers/viper"
 	"pnBot/internal/logger/extractors"
 	loggerfactory "pnBot/internal/logger/logruslogger/factories"
@@ -17,7 +18,7 @@ func Run() {
 	signal.Notify(stopSignal, os.Interrupt, syscall.SIGTERM, syscall.SIGINT, syscall.SIGQUIT)
 	context, cancel := ctx.WithCancel(ctx.Background())
 
-	loggerFactory := CreateLoggerFactory()
+	loggerFactory := createLoggerFactory()
 	baseLogger := loggerFactory.NewBaseLogger()
 
 	botContextHook := hooks.ContextHook{
@@ -42,9 +43,16 @@ func Run() {
 		Hook:       nil,
 	}
 
+	redisClientLoggerOptions := loggerfactory.NewModuleLoggerOptions{
+		BaseLogger: baseLogger,
+		ModuleName: "REDIS_CLIENT",
+		Hook:       nil,
+	}
+
 	botLogger := loggerFactory.NewLoggerWithContext(botLoggerOptions)
 	dbLogger := loggerFactory.NewLoggerWithContext(dbLoggerOptions)
 	adminPanelLogger := loggerFactory.NewLoggerWithContext(adminPanelLoggerOptions)
+	redisClientLogger := loggerFactory.NewLoggerWithContext(redisClientLoggerOptions)
 
 	appConfigOptions := AppConfigOptions{
 		Provider:    &viperprov.ViperConfigProvider{},
@@ -59,11 +67,16 @@ func Run() {
 		baseLogger.Fatalf("Ошибка загрузки конфигурации: %v", err)
 	}
 
-	dbProvider, offerDao := CreateDataBase(config.DataBase, dbLogger, context)
+	dbProvider, offerDao := createDataBase(context, config.DataBase, dbLogger)
 
-	StartBot(&config.Bot, &config.Notifier, &config.Smtp, botLogger, dbProvider, offerDao, context)
+	redisClient := createRedisClient(context, &config.Cache, redisClientLogger)
 
-	StartAdminPanel(config.AdminPanel, config.ImageUploader, dbProvider, adminPanelLogger, context)
+	banManager := banmanager.NewBanManager(context, dbProvider)
+	spamManager := createSpamManager(context, &config.SpamManager, banManager, redisClient)
+
+	startBot(context, &config.Bot, &config.Notifier, &config.Smtp, botLogger, dbProvider, offerDao, spamManager)
+
+	startAdminPanel(context, config.AdminPanel, config.ImageUploader, dbProvider, adminPanelLogger)
 
 	<-stopSignal
 	baseLogger.Info("Получен сигнал завершения, остановка...")

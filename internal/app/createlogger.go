@@ -8,7 +8,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func CreateLoggerFactory() loggeriface.LoggerFactory[logrusfac.NewModuleLoggerOptions, logruslogger.LogrusLogger] {
+func createLoggerFactory() loggeriface.LoggerFactory[logrusfac.NewModuleLoggerOptions, logruslogger.LogrusLogger] {
 	loggerFactoryOptions := logrusfac.LogrusLoggerFactoryOptions{
 		Level: logrus.DebugLevel,
 		Formatter: &logrus.JSONFormatter{
