@@ -76,7 +76,7 @@ func Run() {
 
 	startBot(context, &config.Bot, &config.Notifier, &config.Smtp, botLogger, dbProvider, offerDao, spamManager)
 
-	startAdminPanel(context, config.AdminPanel, config.ImageUploader, dbProvider, adminPanelLogger, userDao, banManager)
+	startAdminPanel(context, config.AdminPanel, config.ImageUploader, dbProvider, adminPanelLogger, userDao, banManager, redisClient)
 
 	<-stopSignal
 	baseLogger.Info("Получен сигнал завершения, остановка...")

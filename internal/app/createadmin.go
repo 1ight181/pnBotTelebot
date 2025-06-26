@@ -7,6 +7,7 @@ import (
 
 	templates "pnBot/internal/adminpanel/templates"
 	banifaces "pnBot/internal/banmanager/interfaces"
+	cacheifaces "pnBot/internal/cache/interfaces"
 	loaders "pnBot/internal/config/loaders"
 	dbifaces "pnBot/internal/db/interfaces"
 	uploaders "pnBot/internal/imageuploader/uploaders"
@@ -64,8 +65,9 @@ func startAdminPanel(
 	logger loggerifaces.Logger,
 	userDao dbifaces.UserDao,
 	banManager banifaces.BanManager,
+	cacheProvider cacheifaces.CacheProvider,
 ) {
-	expectedUsername, expectedPassword, templatesExtension, host, port, staticRoot, staticUrl := loaders.LoadAdminPanelConfig(adminPanelConfig)
+	expectedUsername, expectedPassword, templatesExtension, host, port, staticRoot, staticUrl, maxLogginAttempts, logginBlockDuration := loaders.LoadAdminPanelConfig(adminPanelConfig)
 	freeimagehostApi := loaders.LoadImageUploaderConfig(imageUploaderConfig)
 
 	address := fmt.Sprintf("%s:%s", host, port)
@@ -171,6 +173,9 @@ func startAdminPanel(
 			expectedUsername,
 			expectedPassword,
 			fiberStore,
+			cacheProvider,
+			maxLogginAttempts,
+			logginBlockDuration,
 		))
 
 	fiberServer.GET(
